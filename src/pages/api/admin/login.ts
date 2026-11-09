@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { z } from 'zod';
-import { adminPasswordHash, adminUsername, createSession, safeEqual, verifyPassword } from '../../../lib/auth';
-import { ipKey, json, rateLimit, resetRateLimit, verifyTurnstile } from '../../../lib/security';
+import { createSession, purgeExpiredRevocations, safeEqual, secret, verifyPassword } from '../../../lib/auth';
+import { ipKey, isLimited, json, rateLimit, resetRateLimit, verifyTurnstile } from '../../../lib/security';
 
 export const prerender = false;
 
@@ -11,42 +11,58 @@ const body = z.object({
   turnstile: z.string().min(1).max(4096),
 });
 
-// Hash factice pour garder un temps de réponse constant quand le nom est faux
+// Hash factice aux mêmes paramètres : temps de réponse identique quand le nom est faux
 const DUMMY_HASH = 'scrypt:131072:8:1:AAAAAAAAAAAAAAAAAAAAAA==:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=';
+const MAX_FAILS = 5;
 
-export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
+/**
+ * Ordre volontaire :
+ * 1. l'IP (regroupée /64 en IPv6) est-elle déjà bloquée ?  → 429
+ * 2. Turnstile (action « login » + nom d'hôte)            → 400
+ * 3. mot de passe scrypt en temps constant
+ * 4. SEULS les échecs sont comptés : 5 échecs / 15 min → blocage 30 min pour cette IP.
+ * Aucun verrou global : un attaquant ne peut pas empêcher le propriétaire de se connecter.
+ */
+export const POST: APIRoute = async ({ request, cookies, clientAddress, url }) => {
   const ip = ipKey(clientAddress);
-  // 5 essais / 15 min par IP, puis blocage 30 min ; plafond global contre les attaques distribuées
-  const perIp = await rateLimit('login-ip', ip, 5, 15 * 60_000, 30 * 60_000);
-  if (!perIp.ok) return json({ error: 'Trop de tentatives. Réessayez plus tard.' }, 429, { 'Retry-After': String(perIp.retryAfter) });
-  const global = await rateLimit('login-global', 'all', 60, 60 * 60_000);
-  if (!global.ok) return json({ error: 'Connexion temporairement suspendue.' }, 429, { 'Retry-After': String(global.retryAfter) });
+  const limited = await isLimited('login-fail', ip, MAX_FAILS);
+  if (limited.limited) return json({ error: 'Trop de tentatives. Réessayez plus tard.' }, 429, { 'Retry-After': String(limited.retryAfter) });
 
   if (!(request.headers.get('content-type') ?? '').includes('application/json')) return json({ error: 'Format invalide' }, 415);
-  const parsed = body.safeParse(await request.json().catch(() => null));
+  const raw = await request.text();
+  if (raw.length > 8192) return json({ error: 'Requête trop volumineuse' }, 413);
+  let data: unknown = null;
+  try { data = JSON.parse(raw); } catch { /* invalide */ }
+  const parsed = body.safeParse(data);
   if (!parsed.success) return json({ error: 'Identifiants invalides' }, 400);
 
-  if (!(await verifyTurnstile(parsed.data.turnstile, clientAddress))) {
+  if (!(await verifyTurnstile(parsed.data.turnstile, clientAddress, 'login', url.hostname))) {
     return json({ error: 'Vérification anti-robot échouée' }, 400);
   }
 
   let expectedUser: string, hash: string;
   try {
-    expectedUser = adminUsername();
-    hash = adminPasswordHash();
+    expectedUser = secret('ADMIN_USERNAME');
+    hash = secret('ADMIN_PASSWORD_HASH');
+    secret('PASETO_LOCAL_KEY');
   } catch {
-    console.error('[login] admin non configuré');
+    console.error('[login] administration non configurée');
     return json({ error: 'Administration non configurée' }, 503);
   }
 
   const userOk = safeEqual(parsed.data.username, expectedUser);
   const pwOk = await verifyPassword(parsed.data.password, userOk ? hash : DUMMY_HASH);
   if (!userOk || !pwOk) {
-    await new Promise((r) => setTimeout(r, 300 + Math.random() * 400));
+    const r = await rateLimit('login-fail', ip, MAX_FAILS, 15 * 60_000, 30 * 60_000);
+    const g = await rateLimit('login-fail-global', 'all', 100, 60 * 60_000);
+    if (!g.ok) console.warn('[login] plus de 100 échecs de connexion en une heure : attaque probable');
+    await new Promise((res) => setTimeout(res, 300 + Math.random() * 400));
+    if (!r.ok) return json({ error: 'Trop de tentatives. Réessayez plus tard.' }, 429, { 'Retry-After': String(r.retryAfter) });
     return json({ error: 'Identifiants invalides' }, 401);
   }
 
-  await resetRateLimit('login-ip', ip);
+  await resetRateLimit('login-fail', ip);
+  purgeExpiredRevocations().catch(() => {});
   const session = await createSession(cookies, expectedUser);
   return json({ ok: true, csrf: session.csrf, exp: session.exp });
 };

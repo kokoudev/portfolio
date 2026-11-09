@@ -2,7 +2,7 @@
 const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || (import.meta.env.DEV ? '1x00000000000000000000AA' : '');
 ---
 <section id="contact" class="wrap section contact" aria-labelledby="contact-title">
-  <p class="eyebrow">06 / CONTACT</p>
+  <p class="eyebrow">07 / CONTACT</p>
   <p class="disp huge" aria-hidden="true">PARLONS<span class="outline">-EN</span><span class="pk">.</span></p>
 
   <div class="box">
@@ -31,7 +31,7 @@ const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || (import.meta.env.DE
 </section>
 
 <footer class="wrap foot">
-  <p class="mono">© {new Date().getFullYear()} SOEDJE Kokou Ariel Caesar · fait pousser à Lomé</p>
+  <p class="mono">© {new Date().getFullYear()} SOEDJE Kokou Ariel Caesar — kokoudev · fait pousser à Lomé</p>
   <a href="#top" class="mono">Haut de page ↑</a>
 </footer>
 
@@ -46,7 +46,7 @@ const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || (import.meta.env.DE
   function loadTurnstile() {
     if (!holder || document.getElementById('ts-script')) return;
     window.onTsLoad = () => {
-      widgetId = window.turnstile?.render(holder, { sitekey: holder.dataset.sitekey, theme: 'dark', language: 'fr' });
+      widgetId = window.turnstile?.render(holder, { sitekey: holder.dataset.sitekey, action: 'contact', theme: 'dark', language: 'fr' });
     };
     const s = document.createElement('script');
     s.id = 'ts-script';

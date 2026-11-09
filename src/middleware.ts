@@ -1,5 +1,5 @@
 import { defineMiddleware } from 'astro:middleware';
-import { readSession } from './lib/auth';
+import { readSession, safeEqual } from './lib/auth';
 import { json, sameOrigin } from './lib/security';
 
 const PUBLIC_ADMIN_PATHS = new Set(['/admin/login', '/admin/login/', '/api/admin/login']);
@@ -22,7 +22,7 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
     if (isAdminApi && request.method !== 'GET' && request.method !== 'HEAD') {
       if (!sameOrigin(request, url)) return json({ error: 'Origine refusée' }, 403);
       const csrf = request.headers.get('x-csrf-token');
-      if (!csrf || csrf !== session.csrf) return json({ error: 'Jeton CSRF invalide' }, 403);
+      if (!csrf || !safeEqual(csrf, session.csrf)) return json({ error: 'Jeton CSRF invalide' }, 403);
     }
   }
 

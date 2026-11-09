@@ -14,7 +14,7 @@ import portrait from '../../assets/photo/portrait.jpg';
   <div class="grid">
     <div class="txt">
       <h1 id="hero-title" class="disp">
-        <span class="name rise r1">SOEDJE Kokou Ariel Caesar</span>
+        <span class="name rise r1">SOEDJE Kokou Ariel Caesar <span class="alias mono">alias kokoudev</span></span>
         <span class="big rise r2">JE FAIS</span>
         <span class="big outline rise r3">POUSSER</span>
         <span class="big rise r4">DU CODE<span class="punk">.</span></span>
@@ -76,9 +76,10 @@ import portrait from '../../assets/photo/portrait.jpg';
   .grid{display:flex;flex-wrap:wrap;gap:24px 40px;align-items:center}
   .txt{flex:999 1 560px;min-width:0}
   h1{margin:0;font-weight:900;line-height:.92;color:var(--text-strong)}
-  .name{display:block;font-family:var(--f-disp);font-weight:800;font-size:clamp(1.15rem,2.4vw,1.75rem);letter-spacing:0;line-height:1.2;color:var(--text-strong);margin-bottom:18px;max-width:22ch}
+  .name{display:block;font-family:var(--f-disp);font-weight:800;font-size:clamp(1.15rem,2.4vw,1.75rem);letter-spacing:0;line-height:1.2;color:var(--text-strong);margin-bottom:18px}
   .big{display:block;font-size:clamp(3rem,9vw,8rem);letter-spacing:-2px}
   .punk{color:var(--punk)}
+  .alias{display:inline-block;font-size:.55em;font-weight:600;color:var(--acc);border:1px solid var(--acc);padding:4px 8px;margin-left:8px;vertical-align:middle;letter-spacing:.5px}
   .visual{flex:1 1 320px;min-width:0;position:relative;max-width:440px;margin:0 auto;aspect-ratio:460/500}
   .deco{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
   .photo{position:absolute;left:50%;top:44%;width:58%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;overflow:hidden;border:3px solid var(--acc);box-shadow:0 0 0 8px rgba(7,16,13,.85),0 0 60px -6px var(--acc);background:var(--bg-3)}

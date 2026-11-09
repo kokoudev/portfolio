@@ -11,7 +11,7 @@ const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || (import.meta.env.DE
 <Base title="Connexion — Admin" noindex>
   <main class="lg">
     <form class="card" data-login novalidate>
-      <a href="/" class="mono logo">EVRELY<span class="acc">.admin</span></a>
+      <a href="/" class="mono logo">kokou<span class="acc">dev</span>.admin</a>
       <h1 class="disp">Connexion</h1>
       <div class="f"><label for="u" class="mono">UTILISATEUR</label><input id="u" name="username" autocomplete="username" required maxlength="80" /></div>
       <div class="f"><label for="p" class="mono">MOT DE PASSE</label><input id="p" name="password" type="password" autocomplete="current-password" required maxlength="256" /></div>
@@ -28,7 +28,7 @@ const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || (import.meta.env.DE
   const holder = form.querySelector<HTMLElement>('[data-turnstile]')!;
   const err = form.querySelector<HTMLElement>('[data-err]')!;
   let wid: string | undefined;
-  window.onTsLogin = () => { wid = window.turnstile?.render(holder, { sitekey: holder.dataset.sitekey, theme: 'dark', language: 'fr' }); };
+  window.onTsLogin = () => { wid = window.turnstile?.render(holder, { sitekey: holder.dataset.sitekey, action: 'login', theme: 'dark', language: 'fr' }); };
   const s = document.createElement('script');
   s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTsLogin';
   s.async = true;

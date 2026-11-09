@@ -1,6 +1,7 @@
 import { scrypt as scryptCb, timingSafeEqual, randomBytes, createHash } from 'node:crypto';
 import { promisify } from 'node:util';
 import { encrypt, decrypt } from 'paseto-ts/v4';
+import { getSecret } from 'astro:env/server';
 import type { AstroCookies } from 'astro';
 import { securityStore } from './store';
 
@@ -10,8 +11,9 @@ export const SESSION_COOKIE = '__Host-pf_session';
 const SESSION_TTL_S = 2 * 60 * 60; // 2 h
 const IMPLICIT_ASSERTION = 'portfolio-admin:v1'; // lie le jeton à cette application
 
-function env(name: string): string {
-  const v = process.env[name] ?? (import.meta.env as Record<string, string | undefined>)[name];
+/** Lit un secret À L'EXÉCUTION (jamais copié dans le build). Échoue fermé s'il manque. */
+export function secret(name: string): string {
+  const v = getSecret(name);
   if (!v) throw new Error(`Variable d’environnement manquante : ${name}`);
   return v;
 }
@@ -24,8 +26,9 @@ export async function verifyPassword(password: string, stored: string): Promise<
   if (parts.length !== 6 || parts[0] !== 'scrypt') return false;
   const [, nS, rS, pS, saltB64, hashB64] = parts;
   const N = Number(nS), r = Number(rS), p = Number(pS);
-  if (!Number.isInteger(N) || N < 2 ** 14 || !Number.isInteger(r) || !Number.isInteger(p)) return false;
+  if (!Number.isInteger(N) || N < 2 ** 14 || N > 2 ** 20 || !Number.isInteger(r) || !Number.isInteger(p)) return false;
   const expected = Buffer.from(hashB64, 'base64');
+  if (expected.length < 16) return false;
   const actual = await scrypt(password.normalize('NFKC'), Buffer.from(saltB64, 'base64'), expected.length, {
     N, r, p, maxmem: 256 * N * r,
   });
@@ -60,7 +63,7 @@ export async function createSession(cookies: AstroCookies, username: string): Pr
     aud: 'portfolio-admin',
     iss: 'portfolio',
   };
-  const token = await encrypt(env('PASETO_LOCAL_KEY'), payload, {
+  const token = await encrypt(secret('PASETO_LOCAL_KEY'), payload, {
     assertion: IMPLICIT_ASSERTION,
     addExp: false,
     addIat: false,
@@ -76,21 +79,20 @@ export async function createSession(cookies: AstroCookies, username: string): Pr
   return payload;
 }
 
-/** Vérifie le cookie de session : chiffrement authentifié, expiration, audience, révocation. */
+/** Vérifie le cookie de session : chiffrement authentifié, expiration, audience, émetteur, utilisateur, révocation. */
 export async function readSession(cookies: AstroCookies): Promise<Session | null> {
   const token = cookies.get(SESSION_COOKIE)?.value;
   if (!token || token.length > 2048 || !token.startsWith('v4.local.')) return null;
   try {
     const { payload } = await decrypt<{ sub: string; jti: string; csrf: string; exp: string; aud: string; iss: string }>(
-      env('PASETO_LOCAL_KEY'),
+      secret('PASETO_LOCAL_KEY'),
       token,
       { assertion: IMPLICIT_ASSERTION, maxDepth: 4, maxKeys: 16 },
     );
     if (payload.aud !== 'portfolio-admin' || payload.iss !== 'portfolio') return null;
     if (!payload.exp || Date.parse(payload.exp) <= Date.now()) return null;
-    if (payload.sub !== env('ADMIN_USERNAME')) return null;
-    const revoked = await securityStore().get(`revoked/${payload.jti}`);
-    if (revoked) return null;
+    if (!safeEqual(payload.sub, secret('ADMIN_USERNAME'))) return null;
+    if (await securityStore().get(`revoked/${payload.jti}`)) return null;
     return { sub: payload.sub, jti: payload.jti, csrf: payload.csrf, exp: payload.exp };
   } catch {
     return null;
@@ -98,15 +100,19 @@ export async function readSession(cookies: AstroCookies): Promise<Session | null
 }
 
 export async function destroySession(cookies: AstroCookies, session: Session | null) {
-  if (session) {
-    await securityStore().set(`revoked/${session.jti}`, session.exp);
-  }
+  if (session) await securityStore().set(`revoked/${session.jti}`, session.exp);
   cookies.delete(SESSION_COOKIE, { path: '/', secure: true, httpOnly: true, sameSite: 'strict' });
 }
 
-export function adminUsername() {
-  return env('ADMIN_USERNAME');
-}
-export function adminPasswordHash() {
-  return env('ADMIN_PASSWORD_HASH');
+/** Supprime les révocations dont le jeton a de toute façon expiré (appelé à chaque connexion). */
+export async function purgeExpiredRevocations() {
+  const store = securityStore();
+  const { blobs } = await store.list({ prefix: 'revoked/' });
+  const now = Date.now();
+  await Promise.all(
+    blobs.map(async ({ key }) => {
+      const exp = await store.get(key, { type: 'text' });
+      if (!exp || Date.parse(exp) <= now) await store.delete(key);
+    }),
+  );
 }

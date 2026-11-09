@@ -12,7 +12,9 @@ export const POST: APIRoute = async ({ request, url, clientAddress }) => {
   const rl = await rateLimit('contact', ipKey(clientAddress), 3, 60 * 60_000);
   if (!rl.ok) return json({ error: 'Trop de messages envoyés. Réessayez plus tard.' }, 429);
 
-  if (Number(request.headers.get('content-length') ?? '0') > 16 * 1024) return json({ error: 'Message trop long' }, 413);
+  const len = request.headers.get('content-length');
+  if (!len) return json({ error: 'Longueur requise' }, 411);
+  if (Number(len) > 16 * 1024) return json({ error: 'Message trop long' }, 413);
   let data: Record<string, unknown>;
   try {
     data = Object.fromEntries((await request.formData()).entries());
@@ -23,7 +25,7 @@ export const POST: APIRoute = async ({ request, url, clientAddress }) => {
   if (!parsed.success) return json({ error: parsed.error.issues[0]?.message ?? 'Formulaire invalide' }, 400);
   if (parsed.data.website) return json({ ok: true }); // robot : on fait semblant
 
-  if (!(await verifyTurnstile(parsed.data['cf-turnstile-response'], clientAddress))) {
+  if (!(await verifyTurnstile(parsed.data['cf-turnstile-response'], clientAddress, 'contact', url.hostname))) {
     return json({ error: 'Vérification anti-robot échouée, réessayez.' }, 400);
   }
 

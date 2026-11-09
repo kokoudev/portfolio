@@ -68,7 +68,7 @@ export default function AdminApp({ user }: { user: string }) {
   return (
     <div className="ad">
       <aside className="ad-side">
-        <a href="/" className="ad-logo mono">EVRELY<span>.admin</span></a>
+        <a href="/" className="ad-logo mono">kokou<span>dev</span>.admin</a>
         <nav aria-label="Sections de l’admin" className="ad-tabs">
           {tabs.map((t) => (
             <button key={t.key} type="button" className={`mono ${t.key === tab ? 'on' : ''}`} aria-current={t.key === tab ? 'page' : undefined}
@@ -227,7 +227,7 @@ function ItemForm({ fields, initial, isNew, onSubmit, onCancel, setStatus }: {
 
   const upload = async (f: Field, file: File | undefined) => {
     if (!file) return;
-    if (file.size > 8 * 1024 * 1024) { setStatus({ kind: 'err', text: 'Fichier trop lourd (8 Mo max)' }); return; }
+    if (file.size > 5 * 1024 * 1024) { setStatus({ kind: 'err', text: 'Fichier trop lourd (5 Mo max)' }); return; }
     setUploading(true);
     setStatus({ kind: 'busy', text: 'Envoi du fichier…' });
     try {
