@@ -44,7 +44,7 @@ Esthétique « solarpunk + punk » : fond quadrillé `#07100D`, vert néon `#B6F
 
 ## Installation locale
 
-Prérequis : **Node.js ≥ 22.12**, npm.
+Prérequis : **Node.js ≥ 22.23.4** (exigé par Astro 7), npm.
 
 ```bash
 git clone https://github.com/kokoudev/portfolio.git
@@ -64,8 +64,10 @@ En local, Netlify Blobs est émulé automatiquement et Turnstile utilise les **c
 
 ## Déploiement sur Netlify
 
-1. Sur [app.netlify.com](https://app.netlify.com) : **Add new site → Import an existing project → GitHub** → choisissez ce dépôt. Les réglages de build sont lus dans `netlify.toml`.
-2. **Site configuration → Environment variables**, ajoutez :
+Le projet Netlify **`kokoudev`** existe déjà : **https://kokoudev.netlify.app**.
+
+1. Déploiement continu : [app.netlify.com/projects/kokoudev](https://app.netlify.com/projects/kokoudev) → **Project configuration → Build & deploy → Link repository** → GitHub → `kokoudev/portfolio`. Les réglages de build sont lus dans `netlify.toml`.
+2. **Project configuration → Environment variables**, ajoutez (pour les secrets, cochez « Contains secret values » et limitez le contexte à **Production**, pour qu'aucune prévisualisation de branche ou de pull request ne puisse les lire) :
 
    | Variable | Valeur |
    |---|---|
@@ -75,8 +77,11 @@ En local, Netlify Blobs est émulé automatiquement et Turnstile utilise les **c
    | `PUBLIC_TURNSTILE_SITE_KEY` | clé de site Turnstile |
    | `TURNSTILE_SECRET_KEY` | clé secrète Turnstile (**secret**) |
    | `GITHUB_USERNAME` | `kokoudev` |
-   | `SITE_URL` | l'URL finale, ex. `https://soedje.netlify.app` |
+   | `SITE_URL` | `https://kokoudev.netlify.app` |
    | `GITHUB_TOKEN` | facultatif : jeton « fine-grained » sans aucune permission |
+   | `IP_HASH_SECRET` | facultatif : chaîne aléatoire (**secret**) pour pseudonymiser les IP |
+   | `PUBLIC_GOOGLE_SITE_VERIFICATION` | facultatif : code de Google Search Console |
+   | `PUBLIC_BING_SITE_VERIFICATION` | facultatif : code de Bing Webmaster Tools |
 
 3. **Turnstile** : sur le tableau de bord Cloudflare → Turnstile → *Add widget*, mode « Managed », domaine = votre domaine Netlify. Copiez les deux clés.
 4. Relancez un déploiement (**Deploys → Trigger deploy**). Chaque `git push` sur `main` redéploie automatiquement.
@@ -90,7 +95,7 @@ Sans `TURNSTILE_SECRET_KEY` en production, le formulaire de contact et la connex
 3. Dans chaque onglet :
    - **+ Ajouter** ouvre le formulaire ; **Modifier** / **Supprimer** sur chaque ligne.
    - **Réordonner** : glissez la poignée `⋮⋮`, ou au clavier : Tab jusqu'à la poignée, **Espace**, flèches, **Espace**.
-   - **Fichiers** : images PNG, JPEG, WebP, AVIF ou PDF, 8 Mo max. Le type est vérifié sur le contenu réel du fichier.
+   - **Fichiers** : images PNG, JPEG, WebP, AVIF ou PDF, 5 Mo max (limite des fonctions Netlify). Le type est vérifié sur le contenu réel du fichier.
      ⚠️ Avant d'envoyer une capture, vérifiez qu'**aucun numéro de téléphone** n'y apparaît.
 4. Chaque action est enregistrée immédiatement et le cache du site est purgé : la page publique se met à jour en quelques secondes.
 5. **Vidéo de soutenance** : collez le lien YouTube (vidéo « non répertoriée »). Sur le site, la vidéo n'est chargée qu'au clic (youtube-nocookie).
@@ -107,7 +112,8 @@ Sans `TURNSTILE_SECRET_KEY` en production, le formulaire de contact et la connex
 | Jeton falsifié ou lu | **PASETO v4.local** : chiffré et authentifié (XChaCha20 + BLAKE2b), assertion implicite liée à l'application, vérification de `exp`, `aud`, `iss`, `sub` |
 | Session volée réutilisée | Expiration 2 h, révocation côté serveur à la déconnexion, rotation possible de la clé |
 | CSRF | SameSite=Strict + vérification de l'origine + jeton CSRF (stocké dans la session chiffrée) exigé sur chaque écriture |
-| Force brute | scrypt (N = 2¹⁷), 5 essais / 15 min par IP puis blocage 30 min, plafond global, Turnstile, réponse en temps constant |
+| Force brute | scrypt (N = 2¹⁷), Turnstile lié à l'action « login » et au domaine, 5 échecs / 15 min par IP (IPv6 regroupées en /64) puis blocage 30 min, réponse en temps constant ; aucun verrou global (un attaquant ne peut pas bloquer le propriétaire) |
+| Fuite de secrets | Secrets lus à l'exécution via `astro:env` (jamais copiés dans le code compilé), stores séparés pour les prévisualisations |
 | Injection / XSS stocké | Validation zod de tout le contenu, URLs `https://` uniquement, échappement automatique d'Astro et React |
 | Fichiers malveillants | Type détecté par les octets (pas de SVG ni HTML), nom généré par le serveur, servi avec `nosniff` + CSP `sandbox` |
 | Clickjacking | `X-Frame-Options: DENY`, `frame-ancestors 'none'` |
@@ -122,6 +128,21 @@ Les IP ne sont jamais stockées en clair (empreinte SHA-256).
 - Animations en **CSS / SVG uniquement** (pas de bibliothèque d'animation) ; moins de 3 Ko de JavaScript sur la page publique.
 - Polices auto-hébergées en woff2, sous-ensemble latin, préchargées.
 - Turnstile n'est chargé qu'à l'approche du formulaire ; la vidéo YouTube seulement au clic.
+
+## Référencement : SEO et GEO (« kokoudev »)
+
+Objectif : apparaître en premier pour « kokoudev », dans Google comme dans les assistants IA.
+
+- **Domaine** `kokoudev.netlify.app`, logo, titre, H1 (« alias kokoudev »), FAQ « Qui est kokoudev ? ».
+- **Données structurées** (`src/lib/seo.ts`) : `Person` avec `alternateName: kokoudev`, `ProfilePage`, `WebSite`, `FAQPage`, projets et certifications.
+- **GEO** : `/llms.txt` (résumé factuel lisible par les IA, généré depuis le contenu de l'admin) ; `robots.txt` qui autorise explicitement GPTBot, ClaudeBot, PerplexityBot, Google-Extended…
+- `sitemap.xml`, balise canonique, Open Graph `profile`, `rel="me"` vers GitHub.
+
+**À faire de votre côté (5 minutes)** :
+1. [Google Search Console](https://search.google.com/search-console) → ajouter `https://kokoudev.netlify.app` (méthode « balise HTML ») → copier le code dans `PUBLIC_GOOGLE_SITE_VERIFICATION` → redéployer → valider → **Sitemaps** : `sitemap.xml` → **Inspection d'URL** → « Demander une indexation ».
+2. [Bing Webmaster Tools](https://www.bing.com/webmasters) → importer depuis Google Search Console (Bing alimente aussi ChatGPT Search et DuckDuckGo).
+3. Profil GitHub → **Edit profile → Website** : `https://kokoudev.netlify.app`. Créez aussi un dépôt `kokoudev/kokoudev` (README de profil) avec le lien.
+4. Mettez le même lien et le même pseudo partout (LinkedIn, CV, signature d'email) : chaque mention cohérente renforce la position.
 
 ## Limites gratuites
 
