@@ -1,0 +1,37 @@
+---
+import { resolveImage } from '../../lib/images';
+import type { Diploma } from '../../lib/schema';
+interface Props { items: Diploma[] }
+const { items } = Astro.props;
+---
+<section id="diplomes" class="wrap section" aria-labelledby="diplomes-title">
+  <h2 id="diplomes-title" class="h2"><span class="eyebrow" aria-hidden="true">05 / DIPLÔMES</span>Diplômes<span class="pk">.</span></h2>
+  <ul class="list">
+    {items.map((d) => {
+      const f = resolveImage(d.file);
+      const href = f?.kind === 'media' ? f.src : d.link;
+      return (
+        <li class="tile dip reveal">
+          <span class="doc mono" aria-hidden="true">{f?.kind === 'media' && f.isPdf ? 'PDF' : 'DOC'}</span>
+          <div class="b">
+            <h3 class="t">{d.title}</h3>
+            <p class:list={['mono s', { todo: /À AJOUTER/i.test(d.status) }]}>{d.status}</p>
+          </div>
+          {href && <a class="mono go" href={href} {...(f?.kind === 'media' ? { target: '_blank', rel: 'noopener' } : {})}>Consulter →<span class="sr-only"> {d.title}</span></a>}
+        </li>
+      );
+    })}
+  </ul>
+</section>
+
+<style>
+  .pk{color:var(--punk)}
+  .list{list-style:none;margin:40px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:18px}
+  .dip{display:flex;gap:18px;align-items:center;padding:22px}
+  .doc{width:56px;height:72px;flex:0 0 auto;border:1px solid var(--acc);display:grid;place-items:center;font-size:11px;color:var(--acc)}
+  .b{flex:1;min-width:0}
+  .t{font-size:1.05rem;font-weight:600;color:var(--text-strong)}
+  .s{margin-top:4px;font-size:12px;color:var(--muted)}
+  .s.todo{color:var(--punk-soft)}
+  .go{font-size:13px;font-weight:600;text-decoration:none;padding:12px 0;min-height:44px;display:inline-flex;align-items:center}
+</style>

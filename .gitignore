@@ -1,0 +1,24 @@
+# dépendances et builds
+node_modules/
+dist/
+.astro/
+.netlify/
+
+# secrets — ne JAMAIS publier
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# matériaux de travail (contiennent des captures avec numéros de téléphone)
+_design/
+_captures/
+tools/screens/out/
+
+# divers
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/

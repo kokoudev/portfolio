@@ -1,0 +1,48 @@
+---
+import type { Formation } from '../../lib/schema';
+interface Props { items: Formation[] }
+const { items } = Astro.props;
+---
+<section id="formation" class="wrap section" aria-labelledby="formation-title">
+  <h2 id="formation-title" class="h2"><span class="eyebrow" aria-hidden="true">02 / FORMATION</span>Mon <span class="outline">parcours</span></h2>
+  <p class="intro">Du CEPD à la Licence, du plus ancien au plus récent.</p>
+  <div class="tlw">
+    <svg class="stem v" viewBox="0 0 20 600" preserveAspectRatio="none" aria-hidden="true"><path class="vine" d="M10 0 C 2 80, 18 160, 10 240 S 2 400, 10 600" stroke="#B6FF5C" stroke-width="2" /></svg>
+    <svg class="stem h" viewBox="0 0 1200 20" preserveAspectRatio="none" aria-hidden="true"><path class="vine" d="M0 10 C 150 2, 300 18, 450 10 S 750 2, 900 10 S 1100 18, 1200 10" stroke="#B6FF5C" stroke-width="2" /></svg>
+  <ol class="tl">
+    {items.map((f) => (
+      <li class:list={['tile step reveal', { cur: f.current }]}>
+        <span class="node" aria-hidden="true"></span>
+        <p class="yr disp">{f.year}</p>
+        <h3 class="t">{f.title}</h3>
+        <p class="sc">{f.school}{f.detail && <> · <span class="det">{f.detail}</span></>}</p>
+      </li>
+    ))}
+  </ol>
+  </div>
+</section>
+
+<style>
+  .intro{margin:18px 0 40px;color:var(--text-3);font-size:16px}
+  .tlw{position:relative}
+  .tl{list-style:none;margin:0;padding:0 0 0 44px;position:relative;display:grid;gap:18px}
+  .stem{position:absolute;left:6px;top:0;width:20px;height:100%}
+  .stem .vine{stroke-dasharray:1600;vector-effect:non-scaling-stroke}
+  .stem.h{display:none}
+  .step{position:relative;padding:22px 24px}
+  .node{position:absolute;left:-44px;top:30px;width:14px;height:14px;border:2px solid var(--acc);background:var(--bg);transform:rotate(45deg)}
+  .cur .node{background:var(--acc);width:18px;height:18px;left:-46px;top:28px}
+  .cur{border-width:2px;border-color:var(--acc);background:var(--bg-3)}
+  .yr{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:900;color:#6B8A78;line-height:1}
+  .cur .yr{color:var(--acc)}
+  .t{margin-top:10px;font-size:1.2rem;font-weight:600;color:var(--text-strong)}
+  .sc{margin-top:4px;font-size:15px;color:var(--text-3)}
+  .det{color:var(--punk-soft)}
+  @media (min-width:960px){
+    .tl{grid-template-columns:repeat(4,1fr);padding:56px 0 0}
+    .stem.v{display:none}
+    .stem.h{display:block;left:0;top:14px;width:100%;height:20px}
+    .node{left:24px;top:-38px}
+    .cur .node{left:22px;top:-40px}
+  }
+</style>

@@ -1,0 +1,78 @@
+---
+import Base from '../../layouts/Base.astro';
+import { readSession } from '../../lib/auth';
+
+export const prerender = false;
+let already = false;
+try { already = !!(await readSession(Astro.cookies)); } catch { already = false; }
+if (already) return Astro.redirect('/admin', 303);
+const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || (import.meta.env.DEV ? '1x00000000000000000000AA' : '');
+---
+<Base title="Connexion — Admin" noindex>
+  <main class="lg">
+    <form class="card" data-login novalidate>
+      <a href="/" class="mono logo">EVRELY<span class="acc">.admin</span></a>
+      <h1 class="disp">Connexion</h1>
+      <div class="f"><label for="u" class="mono">UTILISATEUR</label><input id="u" name="username" autocomplete="username" required maxlength="80" /></div>
+      <div class="f"><label for="p" class="mono">MOT DE PASSE</label><input id="p" name="password" type="password" autocomplete="current-password" required maxlength="256" /></div>
+      <div class="ts" data-sitekey={siteKey} data-turnstile></div>
+      <button class="btn btn--acc mono" type="submit">Se connecter</button>
+      <p class="mono err" role="alert" data-err></p>
+      <p class="mono hint">Session chiffrée (PASETO v4.local), cookie HttpOnly · Secure · SameSite=Strict, expiration 2 h.</p>
+    </form>
+  </main>
+</Base>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-login]')!;
+  const holder = form.querySelector<HTMLElement>('[data-turnstile]')!;
+  const err = form.querySelector<HTMLElement>('[data-err]')!;
+  let wid: string | undefined;
+  window.onTsLogin = () => { wid = window.turnstile?.render(holder, { sitekey: holder.dataset.sitekey, theme: 'dark', language: 'fr' }); };
+  const s = document.createElement('script');
+  s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTsLogin';
+  s.async = true;
+  document.head.append(s);
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    err.textContent = '';
+    const fd = new FormData(form);
+    const turnstile = window.turnstile?.getResponse(wid) ?? '';
+    if (!turnstile) { err.textContent = 'Patientez pendant la vérification anti-robot.'; return; }
+    const btn = form.querySelector('button')!;
+    btn.disabled = true;
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: fd.get('username'), password: fd.get('password'), turnstile }),
+        credentials: 'same-origin',
+      });
+      if (res.ok) { location.replace('/admin'); return; }
+      const data = await res.json().catch(() => ({}));
+      err.textContent = data.error ?? 'Connexion impossible.';
+    } catch {
+      err.textContent = 'Réseau indisponible.';
+    } finally {
+      btn.disabled = false;
+      (form.querySelector('#p') as HTMLInputElement).value = '';
+      window.turnstile?.reset(wid);
+    }
+  });
+</script>
+
+<style>
+  .lg{min-height:100vh;display:grid;place-items:center;padding:24px 16px}
+  .card{width:100%;max-width:420px;background:var(--bg-2);border:1px solid var(--acc);padding:32px;display:flex;flex-direction:column;gap:16px}
+  .logo{color:var(--text);text-decoration:none;font-weight:600}
+  .acc{color:var(--acc)}
+  h1{font-size:28px;font-weight:800;color:var(--text-strong)}
+  .f{display:flex;flex-direction:column;gap:6px}
+  label{font-size:12px;color:var(--text-2)}
+  input{background:var(--bg);border:1px solid var(--line-3);color:var(--text);font:inherit;font-size:16px;padding:12px 14px;min-height:48px}
+  input:focus{outline:2px solid var(--acc);outline-offset:1px}
+  .ts{min-height:65px}
+  .err{color:var(--punk-soft);font-size:13px;min-height:1.4em}
+  .hint{font-size:11px;color:var(--muted)}
+</style>

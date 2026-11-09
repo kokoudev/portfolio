@@ -1,0 +1,17 @@
+---
+interface Props { text: string; variant?: 'band' | 'outline' }
+const { text, variant = 'band' } = Astro.props;
+---
+<div class:list={['mq', variant]} aria-hidden="true">
+  <div class:list={['marquee disp', { rev: variant === 'outline', outline: variant === 'outline' }]}>
+    <span>{text}</span><span>{text}</span>
+  </div>
+</div>
+
+<style>
+  .mq{position:relative;z-index:2;overflow:hidden;white-space:nowrap}
+  .band{background:var(--acc);padding:14px 0;transform:rotate(-1.5deg);margin:56px -20px 0;border-block:1px solid var(--line)}
+  .band .marquee{font-size:clamp(18px,2.4vw,26px);font-weight:900;color:var(--bg)}
+  .outline{padding:56px 0 8px}
+  .outline .marquee{font-size:clamp(44px,7vw,84px);font-weight:900;line-height:1}
+</style>

@@ -1,0 +1,37 @@
+---
+const links = [
+  ['#projets', '01', 'Projets'],
+  ['#formation', '02', 'Formation'],
+  ['#certifications', '03', 'Certifs'],
+  ['#soutenance', '04', 'Soutenance'],
+  ['#diplomes', '05', 'Diplômes'],
+];
+---
+<header class="hdr wrap">
+  <a href="#top" class="logo mono" aria-label="Accueil — EVRELY.dev">EVRELY<span class="acc">.dev</span><span class="acc blink" aria-hidden="true">_</span></a>
+  <nav aria-label="Navigation principale">
+    <ul>
+      {links.map(([href, n, label]) => (
+        <li><a href={href} class="mono"><span class="n" aria-hidden="true">{n}</span> {label}</a></li>
+      ))}
+      <li><a href="#contact" class="mono btn btn--acc cta">Parlons-en</a></li>
+    </ul>
+  </nav>
+</header>
+
+<style>
+  .hdr{display:flex;flex-wrap:wrap;gap:12px 16px;align-items:center;justify-content:space-between;padding-top:20px;padding-bottom:20px}
+  .logo{color:var(--text);text-decoration:none;font-weight:600;font-size:15px;letter-spacing:1px;padding:10px 0;min-height:44px;display:inline-flex;align-items:center}
+  .acc{color:var(--acc)}
+  ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:2px;align-items:center}
+  nav a:not(.btn){color:var(--text-2);text-decoration:none;font-size:13px;padding:12px 10px;min-height:44px;display:inline-flex;align-items:center}
+  nav a:not(.btn):hover{color:var(--acc)}
+  .n{color:var(--muted);margin-right:4px}
+  .cta{font-size:13px;min-height:44px;padding:10px 16px;margin-left:6px}
+  @media (max-width:760px){
+    nav{width:100%}
+    ul{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+    ul::-webkit-scrollbar{display:none}
+    nav a:not(.btn),.cta{white-space:nowrap}
+  }
+</style>

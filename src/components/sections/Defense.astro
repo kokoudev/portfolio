@@ -1,0 +1,70 @@
+---
+import type { Video } from '../../lib/schema';
+interface Props { video: Video }
+const { video } = Astro.props;
+const id = video.youtubeId;
+const thumb = id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : '';
+---
+<section id="soutenance" class="wrap section" aria-labelledby="soutenance-title">
+  <div class="lay">
+    <div class="player tile" data-yt={id || undefined} data-title={video.title}>
+      <svg class="vines" viewBox="0 0 640 360" preserveAspectRatio="none" aria-hidden="true">
+        <path class="vine" d="M0 360 C 120 300, 80 220, 180 180 S 320 120, 360 0" stroke="#B6FF5C" stroke-opacity=".35" stroke-width="2" />
+        <path class="vine d2" d="M640 360 C 540 320, 600 240, 500 200" stroke="#FF4FB8" stroke-opacity=".35" stroke-width="2" />
+      </svg>
+      {thumb && <img src={thumb} alt="" class="thumb" loading="lazy" decoding="async" width="480" height="360" />}
+      {id ? (
+        <button type="button" class="play" aria-label={`Lire la vidéo : ${video.title}`}>
+          <svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true"><path d="M8 5v14l11-7z" fill="#B6FF5C" /></svg>
+        </button>
+      ) : (
+        <span class="play off" aria-hidden="true"><svg viewBox="0 0 24 24" width="34" height="34"><path d="M8 5v14l11-7z" fill="#3B5245" /></svg></span>
+      )}
+      <p class="mono cap">{id ? 'Lecture au clic · youtube-nocookie' : '[ VIDÉO DE SOUTENANCE À AJOUTER ]'}</p>
+    </div>
+    <div class="side tile">
+      <h2 id="soutenance-title" class="disp st"><span class="eyebrow" aria-hidden="true">04 / SOUTENANCE</span>La soutenance<span class="pk">.</span></h2>
+      <p class="d"><strong>{video.title}</strong></p>
+      <p class="d">{video.caption}</p>
+      <p class="mono note">La vidéo n’est chargée qu’au clic : aucune donnée n’est envoyée à YouTube avant.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-yt]').forEach((box) => {
+    const id = box.dataset.yt ?? '';
+    if (!/^[A-Za-z0-9_-]{11}$/.test(id)) return;
+    box.querySelector('button.play')?.addEventListener('click', () => {
+      const f = document.createElement('iframe');
+      f.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+      f.title = box.dataset.title ?? 'Vidéo de soutenance';
+      f.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen';
+      f.referrerPolicy = 'strict-origin-when-cross-origin';
+      f.setAttribute('allowfullscreen', '');
+      f.className = 'frame';
+      box.replaceChildren(f);
+      f.focus();
+    }, { once: true });
+  });
+</script>
+
+<style>
+  .lay{display:flex;flex-wrap:wrap;gap:24px;align-items:stretch}
+  .player{flex:999 1 560px;min-width:0;position:relative;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;overflow:hidden;background:var(--bg-2)}
+  .player:hover{transform:none;box-shadow:none}
+  .vines{position:absolute;inset:0;width:100%;height:100%}
+  .thumb{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.55}
+  .play{position:relative;width:96px;height:96px;border-radius:50%;border:2px solid var(--acc);background:var(--bg);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s}
+  .play:hover{transform:scale(1.06);box-shadow:0 0 0 10px rgba(182,255,92,.15)}
+  .play.off{border-color:var(--line-3);cursor:default}
+  .cap{position:absolute;left:20px;bottom:16px;font-size:12px;color:var(--text-3)}
+  .player :global(.frame){position:absolute;inset:0;width:100%;height:100%;border:0}
+  .side{flex:1 1 300px;min-width:0;display:flex;flex-direction:column;gap:16px;padding:30px}
+  .side:hover{transform:none;box-shadow:none}
+  .st{font-size:clamp(1.8rem,3vw,2.2rem);font-weight:900;line-height:1.05;color:var(--text-strong)}
+  .pk{color:var(--punk)}
+  .d{font-size:15px;line-height:1.6;color:var(--text-3)}
+  .d strong{color:var(--text-strong)}
+  .note{margin-top:auto;font-size:12px;color:var(--muted)}
+</style>

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>VISION — localisation (démo)</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Material+Symbols+Rounded:opsz,wght,FILL@24,400,1&display=block" rel="stylesheet">
+<style>
+:root{--bg:#EEF4FF;--primary:#3B82F6;--text:#263449;--muted:#6B7A90;--ok:#22C55E;--alert:#EF4444;--flag:#243B64}
+*{box-sizing:border-box}
+body{margin:0;width:1440px;height:900px;overflow:hidden;font-family:Roboto,system-ui,sans-serif;color:var(--text);
+ background:radial-gradient(900px 600px at 20% 10%,#1d3557 0,#0D1117 60%);display:flex;align-items:center;justify-content:center;gap:54px}
+.ms{font-family:'Material Symbols Rounded';font-size:22px;line-height:1;font-feature-settings:'liga'}
+.phone{width:380px;height:800px;border-radius:46px;background:#0b0f16;padding:12px;box-shadow:0 40px 80px -30px rgba(0,0,0,.8),0 0 0 2px #2b3442}
+.screen{width:100%;height:100%;border-radius:36px;overflow:hidden;background:var(--bg);position:relative;display:flex;flex-direction:column}
+.top{padding:22px 20px 12px;display:flex;align-items:center;justify-content:space-between}
+.top h1{margin:0;font-size:20px;font-weight:700}.top p{margin:2px 0 0;font-size:12px;color:var(--muted)}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:5px 10px;border-radius:999px}
+.map{flex:1;position:relative}
+.map > div{position:absolute;inset:0}
+.sheet{background:#fff;border-radius:24px 24px 0 0;padding:16px 18px 18px;box-shadow:0 -10px 30px -12px rgba(38,52,73,.25);position:relative;z-index:500}
+.grab{width:40px;height:4px;border-radius:2px;background:#D4DCE8;margin:0 auto 12px}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kv div{background:var(--bg);border-radius:14px;padding:10px 12px}.kv span{display:block;font-size:11px;color:var(--muted)}.kv b{font-size:17px}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.btn{border:0;border-radius:14px;padding:13px 10px;font:500 14px Roboto;display:flex;align-items:center;justify-content:center;gap:8px}
+.marker{width:46px;height:46px;border-radius:50%;background:var(--ok);display:grid;place-items:center;color:#fff;box-shadow:0 0 0 8px rgba(34,197,94,.25),0 0 0 18px rgba(34,197,94,.12)}
+.start{width:16px;height:16px;border-radius:50%;background:#fff;border:4px solid var(--primary)}
+.flag{color:var(--flag)}
+.modal{position:absolute;inset:0;background:rgba(15,23,42,.55);z-index:900;display:flex;align-items:flex-end}
+.modal .card{background:#fff;border-radius:26px 26px 0 0;padding:22px 20px;width:100%}
+.leaflet-control-attribution{font-size:9px!important}
+.legend-demo{position:absolute;top:18px;left:50%;transform:translateX(-50%);font:500 12px Roboto;color:#F59E0B;border:1px solid rgba(245,158,11,.5);padding:6px 12px;border-radius:8px;background:rgba(13,17,23,.6)}
+</style>
+</head>
+<body>
+<p class="legend-demo">VISION — module de localisation · données de démonstration</p>
+
+<!-- Écran 1 : carte, position en direct, trajet du jour -->
+<div class="phone"><div class="screen">
+  <div class="top"><div><h1>Ma moto</h1><p>MOTO-01 · AB-1234-CD</p></div><span class="chip" style="background:rgba(34,197,94,.15);color:#15803D"><span class="ms" style="font-size:16px">wifi</span>En ligne</span></div>
+  <div class="map"><div id="m1"></div></div>
+  <div class="sheet"><div class="grab"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:15px">En déplacement</b><span style="font-size:12px;color:var(--muted)">Dernier signal · il y a 12 s</span></div>
+    <div class="kv"><div><span>Vitesse actuelle</span><b>32 km/h</b></div><div><span>Distance aujourd’hui</span><b>4,8 km</b></div><div><span>Trajets · temps de conduite</span><b>2 · 18 min</b></div><div><span>Moteur</span><b style="color:#15803D">Autorisé</b></div></div>
+    <div class="btns"><button class="btn" style="background:var(--alert);color:#fff"><span class="ms">power_settings_new</span>Arrêt moteur</button><button class="btn" style="background:var(--bg);color:var(--text)"><span class="ms">bedtime</span>Mode veille</button></div>
+  </div>
+</div></div>
+
+<!-- Écran 2 : historique des trajets -->
+<div class="phone"><div class="screen">
+  <div class="top"><div><h1>Historique des trajets</h1><p>AUJOURD’HUI</p></div><span class="ms" style="color:var(--primary)">calendar_month</span></div>
+  <div class="map"><div id="m2"></div></div>
+  <div class="sheet"><div class="grab"></div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:10px"><b>Départ 08:12 → Arrivée 08:31</b><span class="ms" style="color:var(--flag)">flag</span></div>
+    <div class="kv"><div><span>Distance</span><b>4,8 km</b></div><div><span>Durée</span><b>19 min</b></div><div><span>Moyenne</span><b>15 km/h</b></div><div><span>Max</span><b>41 km/h</b></div></div>
+  </div>
+</div></div>
+
+<!-- Écran 3 : zone de sécurité + confirmation de coupure -->
+<div class="phone"><div class="screen">
+  <div class="top"><div><h1>Sécurité</h1><p>Zone de sécurité (géofencing)</p></div><span class="chip" style="background:rgba(59,130,246,.12);color:var(--primary)">Rayon actuel : 300 m</span></div>
+  <div class="map"><div id="m3"></div></div>
+  <div class="modal"><div class="card">
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:10px"><span class="ms" style="color:var(--alert);font-size:30px">power_settings_new</span><b style="font-size:17px">Arrêt moteur</b></div>
+    <p style="margin:0 0 16px;color:var(--muted);font-size:14px;line-height:1.5">Cette action sera envoyée au boîtier de la moto. La coupure est refusée tant que la moto roule.</p>
+    <button class="btn" style="width:100%;background:var(--alert);color:#fff;margin-bottom:10px">Confirmer l’arrêt dans 5 s</button>
+    <button class="btn" style="width:100%;background:var(--bg);color:var(--text)">Annuler</button>
+  </div></div>
+</div></div>
+
+<script>
+const tiles = () => L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' });
+const route = [[6.1262,1.2156],[6.1271,1.2170],[6.1283,1.2183],[6.1291,1.2196],[6.1300,1.2205],[6.1308,1.2214],[6.1314,1.2222],[6.1319,1.2228]];
+const opts = { zoomControl:false, attributionControl:true };
+function trace(map){
+  L.polyline(route,{color:'#3B82F6',weight:12,opacity:.18}).addTo(map);
+  L.polyline(route,{color:'#3B82F6',weight:5}).addTo(map);
+  L.marker(route[0],{icon:L.divIcon({className:'',html:'<div class="start"></div>',iconSize:[16,16],iconAnchor:[8,8]})}).addTo(map);
+}
+const m1 = L.map('m1',opts).setView([6.1300,1.2205],16); tiles().addTo(m1); trace(m1);
+L.marker([6.1319,1.2228],{icon:L.divIcon({className:'',html:'<div class="marker"><span class="ms">two_wheeler</span></div>',iconSize:[46,46],iconAnchor:[23,23]})}).addTo(m1);
+const m2 = L.map('m2',opts).setView([6.1291,1.2192],16); tiles().addTo(m2); trace(m2);
+L.marker([6.1319,1.2228],{icon:L.divIcon({className:'',html:'<span class="ms flag" style="font-size:34px">flag</span>',iconSize:[34,34],iconAnchor:[6,30]})}).addTo(m2);
+const m3 = L.map('m3',opts).setView([6.1319,1.2228],16); tiles().addTo(m3);
+L.circle([6.1319,1.2228],{radius:300,color:'#3B82F6',weight:2,fillOpacity:.12}).addTo(m3);
+L.marker([6.1319,1.2228],{icon:L.divIcon({className:'',html:'<div class="marker"><span class="ms">two_wheeler</span></div>',iconSize:[46,46],iconAnchor:[23,23]})}).addTo(m3);
+</script>
+</body>
+</html>
