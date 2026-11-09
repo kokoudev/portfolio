@@ -1,0 +1,74 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/sections/Header.astro';
+import Hero from '../components/sections/Hero.astro';
+import Marquee from '../components/sections/Marquee.astro';
+import Facts from '../components/sections/Facts.astro';
+import Projects from '../components/sections/Projects.astro';
+import Formation from '../components/sections/Formation.astro';
+import Certifications from '../components/sections/Certifications.astro';
+import Defense from '../components/sections/Defense.astro';
+import Diplomas from '../components/sections/Diplomas.astro';
+import Contact from '../components/sections/Contact.astro';
+import { readContent } from '../lib/store';
+import { getRepos } from '../lib/github';
+
+export const prerender = false;
+
+const [content, repos] = await Promise.all([readContent(), getRepos()]);
+
+// Mise en cache sur le CDN Netlify ; purgée automatiquement à chaque enregistrement depuis l'admin
+Astro.response.headers.set('Cache-Control', 'public, max-age=0, must-revalidate');
+Astro.response.headers.set('Netlify-CDN-Cache-Control', 'public, durable, s-maxage=3600, stale-while-revalidate=604800');
+Astro.response.headers.set('Netlify-Cache-Tag', 'content');
+---
+<Base>
+  <a class="skip" href="#main">Aller au contenu</a>
+  <div class="loader" aria-hidden="true">
+    <svg viewBox="0 0 120 120" width="96" height="96"><path class="seed" d="M60 110 C 60 80, 58 60, 60 40 M60 62 C 44 58, 36 46, 34 32 C 50 34, 58 46, 60 62 M60 52 C 74 48, 84 38, 88 24 C 72 26, 62 38, 60 52" fill="none" stroke="#B6FF5C" stroke-width="3" stroke-linecap="round" /></svg>
+    <p class="mono">GERMINATION</p>
+  </div>
+  <div class="spot" aria-hidden="true"></div>
+  <Header />
+  <main id="main">
+    <Hero />
+    <Marquee text="BUILD ✦ GROW ✦ SHIP ✦ LOMÉ ✦ WEB ✦ MOBILE ✦ IOT ✦ IA ✦ " />
+    <Facts />
+    <Projects projects={content.projects} repos={repos} />
+    <Marquee text="SOLARPUNK DEV ✦ MADE IN LOMÉ ✦ " variant="outline" />
+    <Formation items={content.formations} />
+    <Certifications items={content.certifications} />
+    <Defense video={content.video} />
+    <Diplomas items={content.diplomas} />
+    <Contact />
+  </main>
+</Base>
+
+<script>
+  // Halo lumineux qui suit le curseur (désactivé sur tactile et en mouvement réduit)
+  const spot = document.querySelector<HTMLElement>('.spot');
+  if (spot && matchMedia('(pointer: fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let raf = 0;
+    addEventListener('pointermove', (e) => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        spot.style.setProperty('--x', `${e.clientX}px`);
+        spot.style.setProperty('--y', `${e.clientY}px`);
+        spot.classList.add('on');
+      });
+    }, { passive: true });
+  }
+</script>
+
+<style>
+  .loader{position:fixed;inset:0;z-index:60;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;pointer-events:none;animation:loaderOut .35s ease .55s forwards}
+  .loader p{font-size:12px;letter-spacing:4px;color:var(--acc)}
+  .seed{stroke-dasharray:260;stroke-dashoffset:260;animation:draw .55s ease forwards}
+  @media (max-width:760px){.loader{display:none}}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  @keyframes loaderOut{to{opacity:0;visibility:hidden}}
+  .spot{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;transition:opacity .4s;background:radial-gradient(520px circle at var(--x,70%) var(--y,20%),rgba(182,255,92,.08),transparent 60%)}
+  .spot.on{opacity:1}
+  main{position:relative;z-index:2}
+  @media (prefers-reduced-motion:reduce){.loader{display:none}}
+</style>

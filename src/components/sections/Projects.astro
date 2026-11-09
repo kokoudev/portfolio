@@ -1,0 +1,142 @@
+---
+import Img from '../ui/Img.astro';
+import type { Project } from '../../lib/schema';
+import type { Repo } from '../../lib/github';
+
+interface Props { projects: Project[]; repos: Repo[] }
+const { projects, repos } = Astro.props;
+const featured = projects.filter((p) => p.featured);
+const others = projects.filter((p) => !p.featured);
+const filters = [['tous', 'Tous'], ['web', 'Web'], ['client', 'Clients'], ['iot', 'IoT']];
+const isExternal = (u: string) => u.startsWith('https://');
+const badgeClass = (p: Project) => (p.category === 'client' ? 'badge badge--line' : p.featured ? 'badge badge--punk' : 'badge badge--acc');
+const fmt = (d: string) => (d ? new Date(d).toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' }) : '');
+---
+<section id="projets" class="wrap section" aria-labelledby="projets-title">
+  <div class="head">
+    <h2 id="projets-title" class="h2"><span class="eyebrow" aria-hidden="true">01 / PROJETS</span>Ce que j’ai <span class="outline">construit</span></h2>
+    <div class="filters" role="group" aria-label="Filtrer les projets" data-filters hidden>
+      {filters.map(([k, l], i) => (
+        <button type="button" class="mono chip" data-filter={k} aria-pressed={i === 0 ? 'true' : 'false'}>{l}</button>
+      ))}
+    </div>
+  </div>
+
+  {featured.map((p) => (
+    <article class="tile case reveal" data-cat={p.category}>
+      <div class="shots">
+        {p.image && <div class="zoom main"><Img src={p.image} alt={p.imageAlt} widths={[480, 800, 1200]} sizes="(max-width: 900px) 100vw, 60vw" position="top-left" /></div>}
+        {p.gallery.map((g) => <div class="zoom sub"><Img src={g.image} alt={g.alt} widths={[480, 800, 1200]} sizes="(max-width: 900px) 100vw, 60vw" /></div>)}
+      </div>
+      <div class="body">
+        <div class="badges"><span class="badge badge--punk">ÉTUDE DE CAS</span><span class="badge badge--line">{p.badge}</span></div>
+        <h3 class="disp ttl">{p.title.split('—')[0].trim()}{p.title.includes('—') && <><br /><span class="sub">{p.title.split('—').slice(1).join('—').trim()}</span></>}</h3>
+        {p.problem && <p class="pr"><span class="mono lbl pk">PROBLÈME →</span> {p.problem}</p>}
+        {p.solution && <p class="pr"><span class="mono lbl ac">SOLUTION →</span> {p.solution}</p>}
+        {!p.problem && <p class="pr">{p.description}</p>}
+        <p class="mono stack">{p.stack}</p>
+        {p.url ? <a href={p.url} class="mono more" {...(isExternal(p.url) ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>{p.cta || 'Voir →'}</a> : <span class="todo">[ LIEN À AJOUTER ]</span>}
+      </div>
+    </article>
+  ))}
+
+  <div class="cards">
+    {others.map((p, i) => (
+      <article class="tile card reveal" data-cat={p.category}>
+        {p.image && <div class="zoom thumb"><Img src={p.image} alt={p.imageAlt} widths={[400, 800]} sizes="(max-width: 700px) 100vw, 45vw" position="top" /></div>}
+        <div class="cbody">
+          <div class="row"><span class="disp outline num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span><span class={badgeClass(p)}>{p.badge}</span></div>
+          <h3 class="ctitle">{p.title}</h3>
+          <p class="desc">{p.description}</p>
+          <p class="mono stack">{p.stack}</p>
+          {p.url ? <a href={p.url} class="mono more" {...(isExternal(p.url) ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>{p.cta || 'Voir →'}{isExternal(p.url) && <span class="sr-only"> (nouvel onglet)</span>}</a> : <span class="todo">[ LIEN À AJOUTER ]</span>}
+        </div>
+      </article>
+    ))}
+  </div>
+  <p class="mono empty" data-empty hidden>Aucun projet dans cette catégorie pour l’instant.</p>
+
+  <div class="gh reveal">
+    <div class="ghhead">
+      <p class="mono"><span class="acc">$</span> git log --author=kokoudev <span class="muted">→ dépôts publics GitHub, mis à jour automatiquement</span></p>
+      <a href="https://github.com/kokoudev" class="btn mono" target="_blank" rel="noopener noreferrer">github.com/kokoudev ↗</a>
+    </div>
+    {repos.length > 0 ? (
+      <ul class="repos">
+        {repos.map((r) => (
+          <li>
+            <a href={r.url} target="_blank" rel="noopener noreferrer" class="repo tile">
+              <span class="rname mono">{r.name}</span>
+              {r.description && <span class="rdesc">{r.description}</span>}
+              <span class="rmeta mono">{[r.language, r.stars ? `★ ${r.stars}` : '', fmt(r.updatedAt)].filter(Boolean).join(' · ')}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="muted mono small">Dépôts momentanément indisponibles — voir directement sur GitHub.</p>
+    )}
+  </div>
+</section>
+
+<script>
+  // Filtres (amélioration progressive : sans JS, tous les projets restent visibles)
+  const group = document.querySelector<HTMLElement>('[data-filters]');
+  if (group) {
+    group.hidden = false;
+    const items = document.querySelectorAll<HTMLElement>('#projets [data-cat]');
+    const empty = document.querySelector<HTMLElement>('[data-empty]');
+    group.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-filter]');
+      if (!btn) return;
+      const f = btn.dataset.filter;
+      group.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+      let shown = 0;
+      items.forEach((el) => {
+        const ok = f === 'tous' || el.dataset.cat === f;
+        el.hidden = !ok;
+        if (ok) shown++;
+      });
+      if (empty) empty.hidden = shown > 0;
+    });
+  }
+</script>
+
+<style>
+  .head{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between;margin-bottom:36px}
+  .filters{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{font-size:13px;padding:12px 16px;min-height:44px;cursor:pointer;border:1px solid var(--line-3);background:transparent;color:var(--text-2);transition:background .2s,color .2s}
+  .chip[aria-pressed='true']{background:var(--acc);border-color:var(--acc);color:var(--bg);font-weight:600}
+  [hidden]{display:none!important}
+  .case{display:flex;flex-wrap:wrap;overflow:hidden;margin-bottom:20px}
+  .shots{flex:999 1 560px;min-width:0;display:grid;gap:2px;background:var(--line)}
+  .shots :global(img){width:100%;height:100%;object-fit:cover}
+  .main{min-height:280px;background:#0D1117}
+  .body{flex:1 1 360px;min-width:0;padding:clamp(24px,3vw,36px);display:flex;flex-direction:column;gap:16px}
+  .badges{display:flex;gap:10px;flex-wrap:wrap}
+  .ttl{font-size:clamp(1.6rem,2.6vw,2rem);font-weight:900;line-height:1.05;color:var(--text-strong)}
+  .sub{font-weight:800;font-size:.62em;color:var(--acc)}
+  .pr{font-size:15px;line-height:1.6;color:var(--text-2)}
+  .lbl{font-size:12px}.lbl.pk{color:var(--punk-soft)}.lbl.ac{color:var(--acc)}
+  .stack{font-size:12px;color:var(--muted)}
+  .more{font-size:14px;font-weight:600;text-decoration:none;padding:10px 0;min-height:44px;display:inline-flex;align-items:center;align-self:flex-start}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:20px}
+  .card{display:flex;flex-direction:column;overflow:hidden}
+  .thumb{aspect-ratio:16/9;background:var(--bg-3);border-bottom:1px solid var(--line-2)}
+  .thumb :global(img){width:100%;height:100%;object-fit:cover}
+  .cbody{padding:28px;display:flex;flex-direction:column;gap:14px;flex:1}
+  .row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .num{font-size:44px;font-weight:900;line-height:1;-webkit-text-stroke-width:2px}
+  .ctitle{font-size:1.5rem;font-weight:600;color:var(--text-strong)}
+  .desc{font-size:15px;line-height:1.6;color:var(--text-3)}
+  .empty{color:var(--muted);font-size:14px;margin-top:12px}
+  .gh{margin-top:40px;border:1px solid var(--line-2);background:var(--bg-2);padding:22px}
+  .ghhead{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;margin-bottom:20px}
+  .ghhead p{font-size:14px;color:var(--text-2)}
+  .acc{color:var(--acc)}.muted{color:var(--muted)}.small{font-size:13px}
+  .repos{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px}
+  .repo{display:flex;flex-direction:column;gap:8px;padding:18px;height:100%;text-decoration:none;color:var(--text)}
+  .rname{color:var(--acc);font-weight:600;font-size:14px;overflow-wrap:anywhere}
+  .rdesc{font-size:14px;color:var(--text-3)}
+  .rmeta{font-size:12px;color:var(--muted);margin-top:auto}
+</style>

@@ -1,0 +1,111 @@
+---
+const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || (import.meta.env.DEV ? '1x00000000000000000000AA' : '');
+---
+<section id="contact" class="wrap section contact" aria-labelledby="contact-title">
+  <p class="eyebrow">06 / CONTACT</p>
+  <p class="disp huge" aria-hidden="true">PARLONS<span class="outline">-EN</span><span class="pk">.</span></p>
+
+  <div class="box">
+    <span class="spore pk c1" aria-hidden="true"></span>
+    <span class="spore c2" aria-hidden="true"></span>
+    <div class="intro">
+      <h2 id="contact-title" class="disp glitch">On construit quelque chose ?<span class="g g1" aria-hidden="true">On construit quelque chose ?</span><span class="g g2" aria-hidden="true">On construit quelque chose ?</span></h2>
+      <p class="d">Disponible pour un emploi, un stage ou une mission, à Lomé ou à distance.</p>
+      <ul class="links">
+        <li><a href="mailto:soedjekokouarielcaesar@gmail.com" class="btn btn--acc mono mail">soedjekokouarielcaesar@gmail.com</a></li>
+        <li><a href="tel:+22897848880" class="btn mono">+228 97 84 88 80</a></li>
+        <li><a href="https://github.com/kokoudev" class="btn mono" target="_blank" rel="noopener noreferrer">GitHub · kokoudev ↗</a></li>
+      </ul>
+    </div>
+
+    <form class="form" method="post" action="/api/contact" data-contact novalidate>
+      <div class="f"><label for="c-name" class="mono">NOM</label><input id="c-name" name="name" type="text" autocomplete="name" required minlength="2" maxlength="100" /></div>
+      <div class="f"><label for="c-email" class="mono">EMAIL</label><input id="c-email" name="email" type="email" autocomplete="email" required maxlength="200" /></div>
+      <div class="f"><label for="c-msg" class="mono">MESSAGE</label><textarea id="c-msg" name="message" rows="5" required minlength="10" maxlength="4000"></textarea></div>
+      <div class="hp" aria-hidden="true"><label for="c-web">Ne pas remplir</label><input id="c-web" name="website" type="text" tabindex="-1" autocomplete="off" /></div>
+      <div class="ts" data-turnstile data-sitekey={siteKey}></div>
+      <button type="submit" class="btn btn--acc mono">Envoyer le message →</button>
+      <p class="mono status" role="status" aria-live="polite" data-status></p>
+    </form>
+  </div>
+</section>
+
+<footer class="wrap foot">
+  <p class="mono">© {new Date().getFullYear()} SOEDJE Kokou Ariel Caesar · fait pousser à Lomé</p>
+  <a href="#top" class="mono">Haut de page ↑</a>
+</footer>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-contact]');
+  const holder = form?.querySelector<HTMLElement>('[data-turnstile]');
+  const status = form?.querySelector<HTMLElement>('[data-status]');
+  let widgetId: string | undefined;
+
+
+  // Turnstile n'est chargé qu'à l'approche du formulaire (performance)
+  function loadTurnstile() {
+    if (!holder || document.getElementById('ts-script')) return;
+    window.onTsLoad = () => {
+      widgetId = window.turnstile?.render(holder, { sitekey: holder.dataset.sitekey, theme: 'dark', language: 'fr' });
+    };
+    const s = document.createElement('script');
+    s.id = 'ts-script';
+    s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTsLoad';
+    s.async = true;
+    document.head.append(s);
+  }
+  if (form && holder) {
+    const io = new IntersectionObserver((e) => { if (e.some((x) => x.isIntersecting)) { loadTurnstile(); io.disconnect(); } }, { rootMargin: '400px' });
+    io.observe(form);
+    form.addEventListener('focusin', loadTurnstile, { once: true });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!status) return;
+      if (!form.checkValidity()) { status.textContent = 'Merci de remplir correctement tous les champs.'; form.reportValidity(); return; }
+      const btn = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
+      btn.disabled = true;
+      status.textContent = 'Envoi…';
+      try {
+        const res = await fetch('/api/contact', { method: 'POST', body: new FormData(form) });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok) { form.reset(); status.textContent = 'Merci ! Votre message est bien arrivé.'; }
+        else status.textContent = data.error ?? 'Envoi impossible, réessayez.';
+      } catch {
+        status.textContent = 'Réseau indisponible, réessayez.';
+      } finally {
+        btn.disabled = false;
+        window.turnstile?.reset(widgetId);
+      }
+    });
+  }
+</script>
+
+<style>
+  .contact{padding-top:clamp(80px,10vw,120px)}
+  .huge{font-size:clamp(2.6rem,10vw,9rem);font-weight:900;line-height:.9;letter-spacing:-2px;color:var(--text-strong);margin:0 0 40px;overflow-wrap:anywhere}
+  .pk{color:var(--punk)}
+  .box{position:relative;overflow:hidden;border:2px solid var(--acc);background:var(--bg-3);padding:clamp(24px,4vw,56px) clamp(20px,4vw,48px);display:flex;flex-wrap:wrap;gap:40px}
+  .intro{flex:1 1 380px;min-width:0;display:flex;flex-direction:column;gap:16px}
+  #contact-title{font-size:clamp(1.6rem,3vw,2.5rem);font-weight:800;line-height:1.1;color:var(--text-strong)}
+  .d{color:var(--text-3);font-size:16px}
+  .links{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+  .links .btn{font-size:14px;overflow-wrap:anywhere}
+  .mail{max-width:100%}
+  .form{flex:1 1 360px;min-width:0;display:flex;flex-direction:column;gap:14px}
+  .f{display:flex;flex-direction:column;gap:6px}
+  label{font-size:12px;color:var(--text-2)}
+  input,textarea{width:100%;background:var(--bg);border:1px solid var(--line-3);color:var(--text);font:inherit;font-size:16px;padding:12px 14px;min-height:48px}
+  input:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:1px;border-color:var(--acc)}
+  .hp{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}
+  .ts{min-height:65px}
+  .form .btn{align-self:flex-start}
+  .status{font-size:13px;color:var(--acc);min-height:1.5em}
+  .spore{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--acc);box-shadow:0 0 12px var(--acc);opacity:.7;pointer-events:none;animation:float 9s ease-in-out infinite}
+  .spore.pk{background:var(--punk);box-shadow:0 0 12px var(--punk)}
+  .c1{right:12%;top:18%}.c2{right:30%;bottom:14%;animation-delay:3s}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-38px)}}
+  .foot{display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center;padding-top:28px;padding-bottom:40px;margin-top:80px;border-top:1px solid var(--line)}
+  .foot p{font-size:12px;color:var(--muted)}
+  .foot a{font-size:12px;text-decoration:none;padding:12px 0;min-height:44px;display:inline-flex;align-items:center}
+</style>

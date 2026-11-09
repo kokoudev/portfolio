@@ -1,0 +1,12 @@
+---
+import Base from '../../layouts/Base.astro';
+import AdminApp from '../../admin/AdminApp';
+
+export const prerender = false;
+// La session est vérifiée par le middleware avant d'arriver ici.
+const user = Astro.locals.session?.sub ?? '';
+---
+<Base title="Admin — Portfolio" noindex>
+  <AdminApp client:only="react" user={user} />
+  <noscript><p>L’administration nécessite JavaScript.</p></noscript>
+</Base>

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>VISION Admin — démo</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Material+Symbols+Rounded:opsz,wght,FILL@24,400,0&display=block" rel="stylesheet">
+<style>
+:root{--bg:#0D1117;--surface:#161B22;--accent:#3B82F6;--success:#22C55E;--alert:#EF4444;--warning:#F59E0B;--text:#E6EDF3;--muted:#8B949E;--line:#21262D}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Roboto,system-ui,sans-serif;width:1440px;height:900px;overflow:hidden}
+.ms{font-family:'Material Symbols Rounded';font-size:24px;line-height:1;font-feature-settings:'liga'}
+header{height:64px;display:flex;align-items:center;gap:14px;padding:0 20px;border-bottom:1px solid var(--line);background:var(--bg)}
+.logo{width:34px;height:34px;border-radius:9px;background:var(--accent);display:grid;place-items:center}
+.logo svg{width:20px;height:20px}
+header h1{font-size:22px;font-weight:500;margin:0;flex:1}
+.bell{position:relative;color:var(--text)}.bell b{position:absolute;top:-6px;right:-8px;background:var(--alert);font-size:10px;border-radius:9px;padding:1px 5px;font-weight:500}
+.avatar{display:flex;align-items:center;gap:8px;margin-left:22px;font-size:15px}.avatar span.c{width:32px;height:32px;border-radius:50%;background:var(--accent);display:grid;place-items:center;font-size:13px;font-weight:500}
+.wrap{display:flex;height:836px}
+nav{width:88px;background:var(--surface);display:flex;flex-direction:column;align-items:center;padding-top:14px;gap:18px;border-right:1px solid var(--line)}
+nav a{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);font-size:12px;text-decoration:none;position:relative}
+nav a .pill{width:56px;height:32px;border-radius:16px;display:grid;place-items:center}
+nav a.on{color:var(--accent)}nav a.on .pill{background:rgba(59,130,246,.18);color:var(--accent)}
+nav a .badge{position:absolute;top:-4px;right:6px;background:var(--alert);color:#fff;font-size:10px;border-radius:9px;padding:1px 5px}
+nav .foot{margin-top:auto;padding-bottom:18px;text-align:center;color:var(--muted)}nav .foot p{margin:0;font-size:11px}nav .foot p+p{font-size:10px}
+main{flex:1;padding:26px 30px;overflow:hidden}
+.title{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:20px}
+.title h2{margin:0;font-size:24px;font-weight:500}.title p{margin:0;color:var(--muted);font-size:13px}
+.demo{font-size:12px;color:var(--warning);border:1px solid rgba(245,158,11,.4);border-radius:8px;padding:6px 10px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.tile{background:var(--surface);border-radius:16px;padding:18px 18px 16px;border:1px solid var(--line)}
+.tile .h{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:13px}
+.tile .h .ms{font-size:22px;padding:7px;border-radius:10px}
+.tile .v{font-size:30px;font-weight:700;margin:12px 0 4px}.tile .s{font-size:12px;color:var(--muted)}
+.row2{display:grid;grid-template-columns:1.7fr 1fr;gap:16px;margin-top:16px}
+.card{background:var(--surface);border-radius:16px;padding:20px;border:1px solid var(--line)}
+.card h3{margin:0 0 16px;font-size:15px;font-weight:500}
+.mini{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:16px}
+.mini .tile .v{font-size:24px}
+.legend{display:flex;flex-direction:column;gap:10px;margin-top:8px;font-size:13px;color:var(--muted)}.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:8px}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo"><svg viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.4 9.3-8 11-4.6-1.7-8-6-8-11V5z" fill="none" stroke="#fff" stroke-width="2"/><circle cx="12" cy="11" r="3" fill="#fff"/></svg></div>
+  <h1>VISION Admin</h1>
+  <span class="bell ms">notifications<b>3</b></span>
+  <div class="avatar"><span class="c">AD</span>Admin <span class="ms" style="font-size:20px">arrow_drop_down</span></div>
+</header>
+<div class="wrap">
+  <nav>
+    <a class="on"><span class="pill ms">dashboard</span>Dashboard</a>
+    <a><span class="pill ms">event_note</span>Rendez-vous<span class="badge">4</span></a>
+    <a><span class="pill ms">motorcycle</span>Motos</a>
+    <a><span class="pill ms">people</span>Utilisateurs</a>
+    <div class="foot"><p>VISION Admin</p><p>v1.0.0</p></div>
+  </nav>
+  <main>
+    <div class="title"><div><h2>Tableau de bord</h2><p>Vue d’ensemble de la flotte et des abonnements</p></div><span class="demo">Données de démonstration</span></div>
+    <div class="grid">
+      <div class="tile"><div class="h">Revenus (mois en cours)<span class="ms" style="background:rgba(34,197,94,.15);color:var(--success)">payments</span></div><div class="v">186 000 F</div><div class="s">FCFA · abonnements encaissés</div></div>
+      <div class="tile"><div class="h">Abonnements actifs<span class="ms" style="background:rgba(59,130,246,.15);color:var(--accent)">verified</span></div><div class="v">24</div><div class="s">sur 31 motos</div></div>
+      <div class="tile"><div class="h">Motos enregistrées<span class="ms" style="background:rgba(245,158,11,.15);color:var(--warning)">two_wheeler</span></div><div class="v">31</div><div class="s">boîtiers associés</div></div>
+      <div class="tile"><div class="h">Utilisateurs<span class="ms" style="background:rgba(139,148,158,.15);color:var(--text)">group</span></div><div class="v">27</div><div class="s">comptes clients</div></div>
+    </div>
+    <div class="mini">
+      <div class="tile"><div class="h">Rendez-vous en attente</div><div class="v" style="color:var(--warning)">4</div></div>
+      <div class="tile"><div class="h">Rendez-vous planifiés</div><div class="v" style="color:var(--accent)">6</div></div>
+      <div class="tile"><div class="h">Rendez-vous terminés</div><div class="v" style="color:var(--success)">19</div></div>
+      <div class="tile"><div class="h">Rendez-vous annulés</div><div class="v" style="color:var(--alert)">2</div></div>
+    </div>
+    <div class="row2">
+      <div class="card"><h3>Évolution des revenus — 6 derniers mois</h3>
+        <svg viewBox="0 0 760 270" width="100%" height="270">
+          <g stroke="#21262D"><line x1="50" y1="30" x2="750" y2="30"/><line x1="50" y1="90" x2="750" y2="90"/><line x1="50" y1="150" x2="750" y2="150"/><line x1="50" y1="210" x2="750" y2="210"/></g>
+          <g fill="#8B949E" font-size="12" font-family="Roboto"><text x="6" y="34">200k</text><text x="6" y="94">150k</text><text x="6" y="154">100k</text><text x="12" y="214">50k</text>
+          <text x="96" y="256">Mai</text><text x="208" y="256">Juin</text><text x="322" y="256">Juil.</text><text x="436" y="256">Août</text><text x="550" y="256">Sept.</text><text x="666" y="256">Oct.</text></g>
+          <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3B82F6" stop-opacity=".35"/><stop offset="1" stop-color="#3B82F6" stop-opacity="0"/></linearGradient></defs>
+          <path d="M108 222 L222 196 L336 170 L450 146 L564 96 L678 47 L678 240 L108 240Z" fill="url(#g)"/>
+          <polyline points="108,222 222,196 336,170 450,146 564,96 678,47" fill="none" stroke="#3B82F6" stroke-width="3"/>
+          <g fill="#0D1117" stroke="#3B82F6" stroke-width="3"><circle cx="108" cy="222" r="5"/><circle cx="222" cy="196" r="5"/><circle cx="336" cy="170" r="5"/><circle cx="450" cy="146" r="5"/><circle cx="564" cy="96" r="5"/><circle cx="678" cy="47" r="5"/></g>
+        </svg>
+      </div>
+      <div class="card"><h3>Répartition des rendez-vous</h3>
+        <div style="display:flex;align-items:center;gap:26px">
+        <svg viewBox="0 0 42 42" width="190" height="190" style="transform:rotate(-90deg)">
+          <circle cx="21" cy="21" r="15.9" fill="none" stroke="#22C55E" stroke-width="6" stroke-dasharray="61.3 38.7"/>
+          <circle cx="21" cy="21" r="15.9" fill="none" stroke="#3B82F6" stroke-width="6" stroke-dasharray="19.4 80.6" stroke-dashoffset="-61.3"/>
+          <circle cx="21" cy="21" r="15.9" fill="none" stroke="#F59E0B" stroke-width="6" stroke-dasharray="12.9 87.1" stroke-dashoffset="-80.7"/>
+          <circle cx="21" cy="21" r="15.9" fill="none" stroke="#EF4444" stroke-width="6" stroke-dasharray="6.4 93.6" stroke-dashoffset="-93.6"/>
+        </svg>
+        <div class="legend"><span><i style="background:#22C55E"></i>Terminés · 19</span><span><i style="background:#3B82F6"></i>Planifiés · 6</span><span><i style="background:#F59E0B"></i>En attente · 4</span><span><i style="background:#EF4444"></i>Annulés · 2</span></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>
