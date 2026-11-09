@@ -14,8 +14,11 @@ export const GET: APIRoute = async ({ params }) => {
   return new Response(res.data, {
     headers: {
       'Content-Type': mime,
-      'Content-Disposition': `inline; filename="${key}"`,
-      'Cache-Control': 'public, max-age=31536000, immutable',
+      'Content-Disposition': `${mime === 'application/pdf' ? 'attachment' : 'inline'}; filename="${key}"`,
+      // navigateur : 1 jour ; CDN : longue durée mais purgé à la suppression (étiquette par fichier)
+      'Cache-Control': 'public, max-age=86400',
+      'Netlify-CDN-Cache-Control': 'public, durable, max-age=31536000',
+      'Netlify-Cache-Tag': `media-${key}`,
       'X-Content-Type-Options': 'nosniff',
       'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'; sandbox",
       'Cross-Origin-Resource-Policy': 'same-origin',

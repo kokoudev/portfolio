@@ -1,36 +1,30 @@
 ---
 import '../styles/global.css';
 import { getImage } from 'astro:assets';
+import { PUBLIC_GOOGLE_SITE_VERIFICATION, PUBLIC_BING_SITE_VERIFICATION } from 'astro:env/client';
 import ogSource from '../assets/og/og-image.png';
+import { buildJsonLd, faqJsonLd } from '../lib/seo';
+import type { Content } from '../lib/schema';
 
 interface Props {
   title?: string;
   description?: string;
   noindex?: boolean;
+  content?: Content;
+  withFaq?: boolean;
 }
 const {
-  title = 'SOEDJE Kokou Ariel Caesar · Dev full-stack junior à Lomé',
-  description = 'Développeur web & full-stack junior à Lomé (Togo) : projets, certifications Stanford et Cisco, Licence Génie Logiciel IPNET. Disponible.',
+  title = 'kokoudev — SOEDJE Kokou Ariel Caesar, dev full-stack à Lomé',
+  description = 'kokoudev, c’est SOEDJE Kokou Ariel Caesar : développeur web & full-stack junior à Lomé (Togo). Projets, certifications Stanford et Cisco, Licence IPNET.',
   noindex = false,
+  content,
+  withFaq = false,
 } = Astro.props;
 const site = Astro.site ?? new URL(Astro.url.origin);
 const canonical = new URL(Astro.url.pathname, site).toString();
 const og = await getImage({ src: ogSource, format: 'png', width: 1200, height: 630 });
 const ogUrl = new URL(og.src, site).toString();
-const jsonLd = JSON.stringify({
-  '@context': 'https://schema.org',
-  '@type': 'Person',
-  name: 'SOEDJE Kokou Ariel Caesar',
-  jobTitle: 'Développeur web & full-stack junior',
-  address: { '@type': 'PostalAddress', addressLocality: 'Lomé', addressCountry: 'TG' },
-  email: 'mailto:soedjekokouarielcaesar@gmail.com',
-  telephone: '+22897848880',
-  url: site.toString(),
-  sameAs: ['https://github.com/kokoudev'],
-  image: ogUrl,
-  knowsAbout: ['Développement web', 'Full-stack', 'Astro', 'React', 'AdonisJS', 'Flutter', 'IoT ESP32', 'Cybersécurité'],
-  alumniOf: { '@type': 'CollegeOrUniversity', name: 'IPNET Institute of Technology' },
-}).replace(/</g, '\\u003c');
+const jsonLd = buildJsonLd(site, ogUrl, content);
 ---
 <!doctype html>
 <html lang="fr">
@@ -39,29 +33,42 @@ const jsonLd = JSON.stringify({
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="author" content="SOEDJE Kokou Ariel Caesar (kokoudev)" />
+    <meta name="application-name" content="kokoudev" />
     <link rel="canonical" href={canonical} />
-    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    {noindex ? <meta name="robots" content="noindex, nofollow" /> : <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />}
+    {PUBLIC_GOOGLE_SITE_VERIFICATION && <meta name="google-site-verification" content={PUBLIC_GOOGLE_SITE_VERIFICATION} />}
+    {PUBLIC_BING_SITE_VERIFICATION && <meta name="msvalidate.01" content={PUBLIC_BING_SITE_VERIFICATION} />}
     <meta name="theme-color" content="#07100D" />
     <meta name="color-scheme" content="dark" />
+    <meta name="geo.region" content="TG-M" />
+    <meta name="geo.placename" content="Lomé" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="me" href="https://github.com/kokoudev" />
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="Résumé pour les IA (llms.txt)" />
+    <link rel="sitemap" href="/sitemap.xml" />
     <link rel="preload" href="/fonts/unbounded-latin-900-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/space-grotesk-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
 
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content="profile" />
+    <meta property="profile:first_name" content="Kokou Ariel Caesar" />
+    <meta property="profile:last_name" content="SOEDJE" />
+    <meta property="profile:username" content="kokoudev" />
     <meta property="og:locale" content="fr_FR" />
-    <meta property="og:site_name" content="SOEDJE Kokou Ariel Caesar" />
+    <meta property="og:site_name" content="kokoudev" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogUrl} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="SOEDJE Kokou Ariel Caesar — développeur web & full-stack, Lomé" />
+    <meta property="og:image:alt" content="kokoudev — SOEDJE Kokou Ariel Caesar, développeur web & full-stack à Lomé" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogUrl} />
     {!noindex && <script type="application/ld+json" set:html={jsonLd} />}
+    {!noindex && withFaq && <script type="application/ld+json" set:html={faqJsonLd()} />}
   </head>
   <body>
     <slot />

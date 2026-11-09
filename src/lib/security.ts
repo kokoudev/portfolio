@@ -1,10 +1,23 @@
-import { createHash } from 'node:crypto';
+import { createHmac } from 'node:crypto';
+import { getSecret } from 'astro:env/server';
 import { securityStore } from './store';
 
-/** Identifiant d'IP pseudonymisé (on ne stocke jamais l'IP en clair). */
-export function ipKey(ip: string | undefined): string {
-  return createHash('sha256').update(`pf-salt:${ip ?? 'unknown'}`).digest('hex').slice(0, 32);
+/* ---------------- Identifiant d'IP pseudonymisé ---------------- */
+
+/** Regroupe les IPv6 par /64 (un attaquant en possède 2^64 par bloc). */
+export function normalizeIp(ip: string | undefined): string {
+  if (!ip) return 'unknown';
+  if (ip.includes(':') && !ip.startsWith('::ffff:')) return ip.split(':').slice(0, 4).join(':') + '::/64';
+  return ip.replace(/^::ffff:/, '');
 }
+
+/** HMAC secret de l'IP : jamais stockée en clair, non réversible sans le secret. */
+export function ipKey(ip: string | undefined): string {
+  const key = getSecret('IP_HASH_SECRET') || getSecret('PASETO_LOCAL_KEY') || 'dev-only';
+  return createHmac('sha256', key).update(normalizeIp(ip)).digest('hex').slice(0, 32);
+}
+
+/* ---------------- Limiteur de débit (écritures conditionnelles = sans course) ---------------- */
 
 interface Bucket {
   count: number;
@@ -13,24 +26,43 @@ interface Bucket {
 }
 
 /**
- * Limiteur de débit simple à fenêtre fixe, stocké dans Netlify Blobs.
- * Retourne true si la requête est autorisée.
+ * Fenêtre fixe stockée dans Netlify Blobs. Les écritures sont conditionnelles (ETag) :
+ * des requêtes parallèles ne peuvent pas lire le même compteur et passer toutes.
  */
 export async function rateLimit(scope: string, key: string, max: number, windowMs: number, lockMs = 0): Promise<{ ok: boolean; retryAfter: number }> {
   const store = securityStore();
   const k = `rl/${scope}/${key}`;
-  const now = Date.now();
-  let b = ((await store.get(k, { type: 'json' })) as Bucket | null) ?? { count: 0, resetAt: now + windowMs };
-  if (b.lockedUntil && b.lockedUntil > now) return { ok: false, retryAfter: Math.ceil((b.lockedUntil - now) / 1000) };
-  if (b.resetAt <= now) b = { count: 0, resetAt: now + windowMs };
-  b.count += 1;
-  if (b.count > max) {
-    if (lockMs) b.lockedUntil = now + lockMs;
-    await store.setJSON(k, b);
-    return { ok: false, retryAfter: Math.ceil(((b.lockedUntil ?? b.resetAt) - now) / 1000) };
+  const MAX_TRIES = 4;
+  for (let attempt = 0; attempt < MAX_TRIES; attempt++) {
+    const now = Date.now();
+    const cur = await store.getWithMetadata(k, { type: 'json' });
+    let b = (cur?.data as Bucket | undefined) ?? { count: 0, resetAt: now + windowMs };
+    if (b.lockedUntil && b.lockedUntil > now) return { ok: false, retryAfter: Math.ceil((b.lockedUntil - now) / 1000) };
+    if (b.resetAt <= now) b = { count: 0, resetAt: now + windowMs };
+    b.count += 1;
+    const blocked = b.count > max;
+    if (blocked && lockMs) b.lockedUntil = now + lockMs;
+    const last = attempt === MAX_TRIES - 1;
+    // Écriture conditionnelle ; au dernier essai, écriture simple (l'émulateur local gère mal les ETag)
+    const res = last
+      ? await store.setJSON(k, b)
+      : cur?.etag
+        ? await store.setJSON(k, b, { onlyIfMatch: cur.etag })
+        : await store.setJSON(k, b, { onlyIfNew: true });
+    if (!last && res.modified === false) continue; // quelqu'un a écrit entre-temps : on relit
+    return blocked ? { ok: false, retryAfter: Math.ceil(((b.lockedUntil ?? b.resetAt) - now) / 1000) } : { ok: true, retryAfter: 0 };
   }
-  await store.setJSON(k, b);
-  return { ok: true, retryAfter: 0 };
+  return { ok: false, retryAfter: 2 };
+}
+
+/** Lecture seule : la limite est-elle déjà atteinte ? (n'incrémente rien) */
+export async function isLimited(scope: string, key: string, max: number): Promise<{ limited: boolean; retryAfter: number }> {
+  const b = (await securityStore().get(`rl/${scope}/${key}`, { type: 'json' })) as Bucket | null;
+  const now = Date.now();
+  if (!b) return { limited: false, retryAfter: 0 };
+  if (b.lockedUntil && b.lockedUntil > now) return { limited: true, retryAfter: Math.ceil((b.lockedUntil - now) / 1000) };
+  if (b.resetAt > now && b.count >= max) return { limited: true, retryAfter: Math.ceil((b.resetAt - now) / 1000) };
+  return { limited: false, retryAfter: 0 };
 }
 
 export async function resetRateLimit(scope: string, key: string) {
@@ -67,13 +99,18 @@ export function json(data: unknown, status = 200, extra: Record<string, string> 
 
 const TEST_SECRET = '1x0000000000000000000000000000000AA';
 
-export async function verifyTurnstile(token: string, ip: string | undefined): Promise<boolean> {
-  let secret = process.env.TURNSTILE_SECRET_KEY ?? import.meta.env.TURNSTILE_SECRET_KEY;
-  if (!secret) {
-    if (import.meta.env.DEV) secret = TEST_SECRET; // clé de test officielle, uniquement en local
-    else return false; // en production : on refuse si non configuré (fail closed)
+/**
+ * Vérifie un jeton Turnstile côté serveur : succès + action attendue + nom d'hôte attendu.
+ * Un jeton obtenu sur le formulaire de contact ne peut donc pas servir à la connexion admin.
+ */
+export async function verifyTurnstile(token: string, ip: string | undefined, action: 'login' | 'contact', host: string): Promise<boolean> {
+  let secretKey = getSecret('TURNSTILE_SECRET_KEY');
+  const isTest = !secretKey && import.meta.env.DEV;
+  if (!secretKey) {
+    if (isTest) secretKey = TEST_SECRET; // clé de test officielle, uniquement en local
+    else return false; // en production : refus si non configuré (fail closed)
   }
-  const body = new URLSearchParams({ secret, response: token });
+  const body = new URLSearchParams({ secret: secretKey, response: token });
   if (ip) body.set('remoteip', ip);
   try {
     const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
@@ -81,8 +118,10 @@ export async function verifyTurnstile(token: string, ip: string | undefined): Pr
       body,
       signal: AbortSignal.timeout(5000),
     });
-    const data = (await res.json()) as { success?: boolean };
-    return data.success === true;
+    const data = (await res.json()) as { success?: boolean; action?: string; hostname?: string };
+    if (data.success !== true) return false;
+    if (isTest) return true; // les clés de test ne renvoient ni action ni hôte réels
+    return data.action === action && data.hostname === host;
   } catch {
     return false;
   }
@@ -90,7 +129,8 @@ export async function verifyTurnstile(token: string, ip: string | undefined): Pr
 
 /* ---------------- Contrôle des fichiers envoyés ---------------- */
 
-export const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
+/** Netlify Functions limite le corps des requêtes à ~6 Mo : on reste en dessous. */
+export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
 
 /** Détecte le vrai type d'un fichier par ses premiers octets (on n'a jamais confiance dans le type annoncé). */
 export function sniffType(buf: Uint8Array): { mime: string; ext: string } | null {

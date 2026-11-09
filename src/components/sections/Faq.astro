@@ -1,0 +1,26 @@
+---
+import { faq } from '../../lib/seo';
+---
+<section id="faq" class="wrap section" aria-labelledby="faq-title">
+  <h2 id="faq-title" class="h2"><span class="eyebrow" aria-hidden="true">06 / FAQ</span>Qui est <span class="outline">kokoudev</span> ?</h2>
+  <div class="list">
+    {faq.map(([q, a], i) => (
+      <details class="tile item reveal" open={i === 0}>
+        <summary><h3>{q}</h3><span class="mono plus" aria-hidden="true">+</span></summary>
+        <p>{a}</p>
+      </details>
+    ))}
+  </div>
+</section>
+
+<style>
+  .list{margin-top:40px;display:grid;gap:12px;max-width:900px}
+  .item{padding:0}
+  .item:hover,.item:focus-within{transform:none;box-shadow:none}
+  summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 22px;min-height:56px}
+  summary::-webkit-details-marker{display:none}
+  h3{font-size:1.1rem;font-weight:600;color:var(--text-strong)}
+  .plus{font-size:22px;color:var(--acc);transition:transform .25s}
+  details[open] .plus{transform:rotate(45deg)}
+  p{padding:0 22px 20px;color:var(--text-2);line-height:1.65}
+</style>

@@ -4,20 +4,29 @@ import { seed } from '../data/seed';
 
 const CONTENT_KEY = 'site-v1';
 
+/**
+ * Les Deploy Previews et branch deploys ne touchent JAMAIS aux données de production :
+ * leurs stores sont préfixés « preview- ».
+ */
+function name(base: string) {
+  const ctx = process.env.CONTEXT; // fourni par Netlify : production | deploy-preview | branch-deploy | dev
+  return ctx && ctx !== 'production' && ctx !== 'dev' ? `preview-${base}` : base;
+}
+
 function contentStore() {
-  return getStore({ name: 'content', consistency: 'strong' });
+  return getStore({ name: name('content'), consistency: 'strong' });
 }
 export function mediaStore() {
-  return getStore({ name: 'media', consistency: 'strong' });
+  return getStore({ name: name('media'), consistency: 'strong' });
 }
 export function securityStore() {
-  return getStore({ name: 'security', consistency: 'strong' });
+  return getStore({ name: name('security'), consistency: 'strong' });
 }
 export function messagesStore() {
-  return getStore({ name: 'messages', consistency: 'strong' });
+  return getStore({ name: name('messages'), consistency: 'strong' });
 }
 export function cacheStore() {
-  return getStore({ name: 'cache' });
+  return getStore({ name: name('cache') });
 }
 
 /** Lit le contenu ; retombe sur le contenu initial si rien n'est enregistré ou si Blobs est indisponible. */

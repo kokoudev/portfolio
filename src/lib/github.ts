@@ -1,3 +1,4 @@
+import { getSecret, GITHUB_USERNAME } from 'astro:env/server';
 import { cacheStore } from './store';
 
 export interface Repo {
@@ -13,7 +14,7 @@ const TTL_MS = 6 * 60 * 60 * 1000; // 6 h
 
 /** Dépôts publics GitHub, mis en cache 6 h dans Netlify Blobs (la limite publique est de 60 req/h). */
 export async function getRepos(): Promise<Repo[]> {
-  const user = process.env.GITHUB_USERNAME || import.meta.env.GITHUB_USERNAME || 'kokoudev';
+  const user = GITHUB_USERNAME || 'kokoudev';
   if (!/^[A-Za-z0-9-]{1,39}$/.test(user)) return [];
   const key = `github/${user}`;
   let cached = null as { at: number; repos: Repo[] } | null;
@@ -29,7 +30,7 @@ export async function getRepos(): Promise<Repo[]> {
       'User-Agent': 'portfolio-soedje',
       'X-GitHub-Api-Version': '2022-11-28',
     };
-    const token = process.env.GITHUB_TOKEN || import.meta.env.GITHUB_TOKEN;
+    const token = getSecret('GITHUB_TOKEN');
     if (token) headers.Authorization = `Bearer ${token}`;
     const res = await fetch(`https://api.github.com/users/${user}/repos?type=owner&sort=updated&per_page=30`, {
       headers,
