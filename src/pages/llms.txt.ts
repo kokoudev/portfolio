@@ -11,7 +11,7 @@ export const prerender = false;
  */
 export const GET: APIRoute = async ({ site }) => {
   const c = await readContent();
-  const base = (site ?? new URL('https://kokoudev.netlify.app')).toString().replace(/\/$/, '');
+  const base = String(site ?? import.meta.env.SITE).replace(/\/$/, '');
   const link = (u: string) => (u.startsWith('https://') ? u : u.startsWith('#') ? `${base}/${u}` : '');
   const lines = [
     `# kokoudev — ${identity.name}`,

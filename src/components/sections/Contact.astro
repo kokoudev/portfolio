@@ -6,8 +6,6 @@ const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || (import.meta.env.DE
   <p class="disp huge" aria-hidden="true">PARLONS<span class="outline">-EN</span><span class="pk">.</span></p>
 
   <div class="box">
-    <span class="spore pk c1" aria-hidden="true"></span>
-    <span class="spore c2" aria-hidden="true"></span>
     <div class="intro">
       <h2 id="contact-title" class="disp glitch">On construit quelque chose ?<span class="g g1" aria-hidden="true">On construit quelque chose ?</span><span class="g g2" aria-hidden="true">On construit quelque chose ?</span></h2>
       <p class="d">Disponible pour un emploi, un stage ou une mission, à Lomé ou à distance.</p>
@@ -101,10 +99,6 @@ const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || (import.meta.env.DE
   .ts{min-height:65px}
   .form .btn{align-self:flex-start}
   .status{font-size:13px;color:var(--acc);min-height:1.5em}
-  .spore{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--acc);box-shadow:0 0 12px var(--acc);opacity:.7;pointer-events:none;animation:float 9s ease-in-out infinite}
-  .spore.pk{background:var(--punk);box-shadow:0 0 12px var(--punk)}
-  .c1{right:12%;top:18%}.c2{right:30%;bottom:14%;animation-delay:3s}
-  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-38px)}}
   .foot{display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center;padding-top:28px;padding-bottom:40px;margin-top:80px;border-top:1px solid var(--line)}
   .foot p{font-size:12px;color:var(--muted)}
   .foot a{font-size:12px;text-decoration:none;padding:12px 0;min-height:44px;display:inline-flex;align-items:center}

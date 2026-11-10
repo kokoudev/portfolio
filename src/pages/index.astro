@@ -27,7 +27,6 @@ Astro.response.headers.set('Netlify-Vary', 'query=none'); // ?x=1, ?x=2… ne co
 ---
 <Base content={content} withFaq>
   <a class="skip" href="#main">Aller au contenu</a>
-  <div class="spot" aria-hidden="true"></div>
   <Header />
   <main id="main">
     <Hero />
@@ -35,7 +34,6 @@ Astro.response.headers.set('Netlify-Vary', 'query=none'); // ?x=1, ?x=2… ne co
     <Facts projects={content.projects} />
     <Projects projects={content.projects} repos={repos} />
     <Skills projects={content.projects} />
-    <Marquee text="SOLARPUNK DEV ✦ MADE IN LOMÉ ✦ " variant="outline" />
     <Formation items={content.formations} />
     <Certifications items={content.certifications} />
     <Defense video={content.video} />
@@ -45,24 +43,7 @@ Astro.response.headers.set('Netlify-Vary', 'query=none'); // ?x=1, ?x=2… ne co
   </main>
 </Base>
 
-<script>
-  // Halo lumineux qui suit le curseur (désactivé sur tactile et en mouvement réduit)
-  const spot = document.querySelector<HTMLElement>('.spot');
-  if (spot && matchMedia('(pointer: fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    let raf = 0;
-    addEventListener('pointermove', (e) => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        spot.style.setProperty('--x', `${e.clientX}px`);
-        spot.style.setProperty('--y', `${e.clientY}px`);
-        spot.classList.add('on');
-      });
-    }, { passive: true });
-  }
-</script>
 
 <style>
-  .spot{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;transition:opacity .4s;background:radial-gradient(520px circle at var(--x,70%) var(--y,20%),rgba(182,255,92,.08),transparent 60%)}
-  .spot.on{opacity:1}
   main{position:relative;z-index:2}
 </style>

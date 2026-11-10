@@ -17,7 +17,7 @@ const user = Astro.locals.session?.sub ?? '';
     <p>Une extension du navigateur (bloqueur de publicité, antitraqueur…) bloque probablement le script.</p>
     <ul>
       <li>Ouvrez cette page dans une <strong>fenêtre de navigation privée</strong>, ou</li>
-      <li>désactivez vos extensions pour <strong>kokoudev.netlify.app</strong>, puis rechargez.</li>
+      <li>désactivez vos extensions pour <strong>{Astro.url.hostname}</strong>, puis rechargez.</li>
     </ul>
     <p class="mono err" data-boot-err></p>
   </div>

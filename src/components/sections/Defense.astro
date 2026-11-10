@@ -9,8 +9,8 @@ const thumb = id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : '';
   <div class="lay">
     <div class="player tile" data-yt={id || undefined} data-title={video.title}>
       <svg class="vines" viewBox="0 0 640 360" preserveAspectRatio="none" aria-hidden="true">
-        <path class="vine" d="M0 360 C 120 300, 80 220, 180 180 S 320 120, 360 0" stroke="#B6FF5C" stroke-opacity=".35" stroke-width="2" />
-        <path class="vine d2" d="M640 360 C 540 320, 600 240, 500 200" stroke="#FF4FB8" stroke-opacity=".35" stroke-width="2" />
+        <path class="vine still" d="M0 360 C 120 300, 80 220, 180 180 S 320 120, 360 0" stroke="#B6FF5C" stroke-opacity=".35" stroke-width="2" />
+        <path class="vine still" d="M640 360 C 540 320, 600 240, 500 200" stroke="#FF4FB8" stroke-opacity=".35" stroke-width="2" />
       </svg>
       {thumb && <img src={thumb} alt="" class="thumb" loading="lazy" decoding="async" width="480" height="360" />}
       {id ? (
