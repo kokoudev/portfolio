@@ -271,6 +271,10 @@ function ItemForm({ fields, initial, isNew, onSubmit, onCancel, setStatus }: {
                 <p className="mono ad-ref">{v ? `Actuel : ${String(v)}` : 'Aucun fichier'}{v ? <button type="button" className="ad-link" onClick={() => set(f.name, '')}>retirer</button> : null}</p>
               </>
             )}
+            {f.type === 'gallery' && (
+              <GalleryField id={id} accept={f.accept} items={(v as GalleryItem[]) ?? []} onChange={(g) => set(f.name, g)} uploading={uploading} setUploading={setUploading} setStatus={setStatus} />
+            )}
+            {f.type === 'videos' && <VideosField id={id} items={(v as VideoItem[]) ?? []} onChange={(list) => set(f.name, list)} />}
             {f.hint && <p className="mono ad-hint">{f.hint}</p>}
           </div>
         );
@@ -280,6 +284,117 @@ function ItemForm({ fields, initial, isNew, onSubmit, onCancel, setStatus }: {
         <button type="button" className="mono ad-btn" onClick={onCancel}>Annuler</button>
       </div>
     </form>
+  );
+}
+
+/* ---------------- Galerie de captures / images ---------------- */
+
+interface GalleryItem { image: string; alt: string }
+interface VideoItem { youtubeId: string; title: string }
+
+/** Aperçu : les fichiers envoyés sont servis par /media ; les images embarquées au build n'ont pas d'aperçu ici. */
+function preview(ref: string) {
+  return ref.startsWith('media:') && !ref.endsWith('.pdf') ? `/media/${ref.slice(6)}` : '';
+}
+
+function move<T>(list: T[], i: number, d: -1 | 1): T[] {
+  const j = i + d;
+  if (j < 0 || j >= list.length) return list;
+  const next = [...list];
+  [next[i], next[j]] = [next[j], next[i]];
+  return next;
+}
+
+function GalleryField({ id, accept, items, onChange, uploading, setUploading, setStatus }: {
+  id: string;
+  accept?: string;
+  items: GalleryItem[];
+  onChange: (g: GalleryItem[]) => void;
+  uploading: boolean;
+  setUploading: (b: boolean) => void;
+  setStatus: (s: { kind: 'ok' | 'err' | 'busy'; text: string }) => void;
+}) {
+  const addFiles = async (files: FileList | null) => {
+    if (!files?.length) return;
+    setUploading(true);
+    const added: GalleryItem[] = [];
+    try {
+      for (const file of Array.from(files)) {
+        if (file.size > 5 * 1024 * 1024) { setStatus({ kind: 'err', text: `${file.name} : trop lourd (5 Mo max)` }); continue; }
+        setStatus({ kind: 'busy', text: `Envoi de ${file.name}…` });
+        const { ref } = await api.upload(file);
+        added.push({ image: ref, alt: '' });
+      }
+      if (added.length) {
+        onChange([...items, ...added]);
+        setStatus({ kind: 'ok', text: `${added.length} image(s) ajoutée(s) ✓ — décrivez-les puis enregistrez` });
+      }
+    } catch (e) {
+      setStatus({ kind: 'err', text: (e as Error).message });
+      if (added.length) onChange([...items, ...added]);
+    } finally { setUploading(false); }
+  };
+  return (
+    <div className="ad-gal">
+      {items.length === 0 && <p className="mono ad-ref">Aucune image pour l’instant.</p>}
+      <ul>
+        {items.map((g, i) => {
+          const src = preview(g.image);
+          return (
+            <li key={`${g.image}-${i}`} className="ad-galrow">
+              {src ? <img src={src} alt="" width={96} height={64} /> : <span className="mono ad-galph">{g.image.replace(/^asset:/, '')}</span>}
+              <input aria-label={`Description de l’image ${i + 1}`} placeholder="Description (ce que montre l’image)" value={g.alt} maxLength={200}
+                onChange={(e) => onChange(items.map((x, j) => (j === i ? { ...x, alt: e.target.value } : x)))} />
+              <div className="ad-galbtns">
+                <button type="button" className="ad-btn mono" aria-label={`Monter l’image ${i + 1}`} disabled={i === 0} onClick={() => onChange(move(items, i, -1))}>↑</button>
+                <button type="button" className="ad-btn mono" aria-label={`Descendre l’image ${i + 1}`} disabled={i === items.length - 1} onClick={() => onChange(move(items, i, 1))}>↓</button>
+                <button type="button" className="ad-btn danger mono" aria-label={`Retirer l’image ${i + 1}`} onClick={() => onChange(items.filter((_, j) => j !== i))}>✕</button>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+      <input id={id} type="file" accept={accept} multiple disabled={uploading} onChange={(e) => { addFiles(e.target.files); e.target.value = ''; }} />
+    </div>
+  );
+}
+
+/* ---------------- Vidéos YouTube d'un projet ---------------- */
+
+function parseYoutube(s: string): string {
+  const m = s.trim().match(/(?:youtu\.be\/|v=|embed\/|shorts\/|live\/)([A-Za-z0-9_-]{11})/) ?? s.trim().match(/^([A-Za-z0-9_-]{11})$/);
+  return m ? m[1] : '';
+}
+
+function VideosField({ id, items, onChange }: { id: string; items: VideoItem[]; onChange: (v: VideoItem[]) => void }) {
+  const [link, setLink] = useState('');
+  const [title, setTitle] = useState('');
+  const vid = parseYoutube(link);
+  return (
+    <div className="ad-gal">
+      {items.length === 0 && <p className="mono ad-ref">Aucune vidéo pour l’instant.</p>}
+      <ul>
+        {items.map((v, i) => (
+          <li key={`${v.youtubeId}-${i}`} className="ad-galrow">
+            <img src={`https://i.ytimg.com/vi/${v.youtubeId}/mqdefault.jpg`} alt="" width={96} height={54} />
+            <input aria-label={`Titre de la vidéo ${i + 1}`} value={v.title} maxLength={160} placeholder="Titre de la vidéo"
+              onChange={(e) => onChange(items.map((x, j) => (j === i ? { ...x, title: e.target.value } : x)))} />
+            <div className="ad-galbtns">
+              <button type="button" className="ad-btn mono" aria-label={`Monter la vidéo ${i + 1}`} disabled={i === 0} onClick={() => onChange(move(items, i, -1))}>↑</button>
+              <button type="button" className="ad-btn mono" aria-label={`Descendre la vidéo ${i + 1}`} disabled={i === items.length - 1} onClick={() => onChange(move(items, i, 1))}>↓</button>
+              <button type="button" className="ad-btn danger mono" aria-label={`Retirer la vidéo ${i + 1}`} onClick={() => onChange(items.filter((_, j) => j !== i))}>✕</button>
+            </div>
+          </li>
+        ))}
+      </ul>
+      <div className="ad-vidadd">
+        <input id={id} type="text" inputMode="url" placeholder="Lien YouTube (https://youtu.be/…)" value={link} onChange={(e) => setLink(e.target.value)} />
+        <input aria-label="Titre de la nouvelle vidéo" type="text" placeholder="Titre (ex. Démo de l’application)" value={title} maxLength={160} onChange={(e) => setTitle(e.target.value)} />
+        <button type="button" className="ad-btn mono" disabled={!vid || items.length >= 6}
+          onClick={() => { onChange([...items, { youtubeId: vid, title: title.trim() || 'Vidéo' }]); setLink(''); setTitle(''); }}>+ Ajouter la vidéo</button>
+      </div>
+      <p className="mono ad-ref">{link && !vid ? 'Lien YouTube non reconnu' : 'Vidéo « non répertoriée » conseillée · chargée seulement au clic sur le site'}</p>
+    </div>
   );
 }
 

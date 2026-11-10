@@ -1,6 +1,6 @@
 import type { CollectionName } from '../lib/schema';
 
-export type FieldType = 'text' | 'textarea' | 'url' | 'select' | 'checkbox' | 'file';
+export type FieldType = 'text' | 'textarea' | 'url' | 'select' | 'checkbox' | 'file' | 'gallery' | 'videos';
 export interface Field {
   name: string;
   label: string;
@@ -35,6 +35,8 @@ export const fields: Record<CollectionName, Field[]> = {
     { name: 'cta', label: 'Texte du lien', type: 'text' },
     { name: 'image', label: 'Capture', type: 'file', accept: IMG, hint: 'Vérifiez qu’aucun numéro de téléphone n’apparaît sur la capture.' },
     { name: 'imageAlt', label: 'Description de la capture (accessibilité)', type: 'text' },
+    { name: 'gallery', label: 'Autres captures d’écran', type: 'gallery', accept: IMG, hint: 'Vérifiez qu’aucun numéro de téléphone n’apparaît sur les captures.' },
+    { name: 'videos', label: 'Vidéos YouTube (démo, présentation…)', type: 'videos' },
     { name: 'featured', label: 'Mettre en avant (étude de cas)', type: 'checkbox' },
   ],
   formations: [
@@ -51,6 +53,7 @@ export const fields: Record<CollectionName, Field[]> = {
     { name: 'description', label: 'Description', type: 'textarea' },
     { name: 'image', label: 'Image du certificat', type: 'file', accept: IMG },
     { name: 'verifyUrl', label: 'Lien de vérification (https://…)', type: 'url' },
+    { name: 'gallery', label: 'Images supplémentaires (autres pages, relevé…)', type: 'gallery', accept: IMG },
   ],
   diplomas: [
     { name: 'title', label: 'Titre', type: 'text', required: true },
@@ -62,15 +65,24 @@ export const fields: Record<CollectionName, Field[]> = {
 
 export function emptyItem(c: CollectionName): Record<string, unknown> {
   const base: Record<string, unknown> = {};
-  for (const f of fields[c]) base[f.name] = f.type === 'checkbox' ? false : f.type === 'select' ? f.options?.[0]?.[0] : '';
-  if (c === 'projects') base.gallery = [];
+  for (const f of fields[c]) {
+    base[f.name] =
+      f.type === 'checkbox' ? false
+      : f.type === 'select' ? f.options?.[0]?.[0]
+      : f.type === 'gallery' || f.type === 'videos' ? []
+      : '';
+  }
   return base;
 }
 
 export function summary(c: CollectionName, it: Record<string, unknown>): { title: string; meta: string } {
   const s = (k: string) => String(it[k] ?? '');
   switch (c) {
-    case 'projects': return { title: s('title'), meta: [s('badge'), s('stack')].filter(Boolean).join(' · ') };
+    case 'projects': {
+      const n = (k: string) => (Array.isArray(it[k]) ? (it[k] as unknown[]).length : 0);
+      const extras = [n('gallery') ? `${n('gallery')} capture(s)` : '', n('videos') ? `${n('videos')} vidéo(s)` : ''];
+      return { title: s('title'), meta: [s('badge'), s('stack'), ...extras].filter(Boolean).join(' · ') };
+    }
     case 'formations': return { title: s('title'), meta: [s('year'), s('school')].filter(Boolean).join(' · ') };
     case 'certifications': return { title: s('title'), meta: [s('issuer'), s('date'), it.verifyUrl ? 'lien ✓' : 'sans lien'].filter(Boolean).join(' · ') };
     case 'diplomas': return { title: s('title'), meta: s('status') };

@@ -1,10 +1,11 @@
-import type { Content } from '../lib/schema';
+import { contentSchema, type Content } from '../lib/schema';
+import type { z } from 'zod';
 
 /**
  * Contenu initial du site. Il sert tant que rien n'a été enregistré depuis l'admin.
  * Règle : rien d'inventé — tout ce qui manque est marqué « À AJOUTER ».
  */
-export const seed: Content = {
+const rawSeed: z.input<typeof contentSchema> = {
   projects: [
     {
       id: 'vision',
@@ -148,3 +149,6 @@ export const seed: Content = {
     caption: 'Présentation du projet de fin d’études devant le jury d’IPNET.',
   },
 };
+
+/** Contenu initial validé (les valeurs par défaut du schéma sont appliquées). */
+export const seed: Content = contentSchema.parse(rawSeed);

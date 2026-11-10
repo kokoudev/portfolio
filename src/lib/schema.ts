@@ -32,6 +32,18 @@ export const imageRef = z
 
 const id = z.string().regex(/^[a-z0-9-]{1,64}$/);
 
+/** Identifiant de vidéo YouTube (11 caractères) — seul l'identifiant est stocké, jamais une URL libre. */
+export const youtubeId = z
+  .string()
+  .trim()
+  .refine((v) => /^[A-Za-z0-9_-]{11}$/.test(v), { message: 'Identifiant YouTube invalide (11 caractères)' });
+
+/** Capture ou image supplémentaire (avec texte alternatif pour l'accessibilité). */
+const galleryItem = z.object({ image: imageRef.refine((v) => v !== '', { message: 'Image manquante' }), alt: text(200) });
+
+/** Vidéo YouTube rattachée à un projet. */
+const videoItem = z.object({ youtubeId, title: text(160) });
+
 export const projectSchema = z.object({
   id,
   title: text(120).pipe(z.string().min(1)),
@@ -43,7 +55,8 @@ export const projectSchema = z.object({
   cta: text(60),
   image: imageRef,
   imageAlt: text(200),
-  gallery: z.array(z.object({ image: imageRef, alt: text(200) })).max(6).default([]),
+  gallery: z.array(galleryItem).max(12).default([]),
+  videos: z.array(videoItem).max(6).default([]),
   featured: z.boolean().default(false),
   problem: text(300).default(''),
   solution: text(400).default(''),
@@ -66,6 +79,7 @@ export const certificationSchema = z.object({
   description: text(300).default(''),
   image: imageRef,
   verifyUrl: safeUrl,
+  gallery: z.array(galleryItem).max(6).default([]),
 });
 
 export const diplomaSchema = z.object({
