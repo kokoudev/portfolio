@@ -18,7 +18,6 @@ const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || (import.meta.env.DE
       <div class="ts" data-sitekey={siteKey} data-turnstile></div>
       <button class="btn btn--acc mono" type="submit">Se connecter</button>
       <p class="mono err" role="alert" data-err></p>
-      <p class="mono hint">Session chiffrée (PASETO v4.local), cookie HttpOnly · Secure · SameSite=Strict, expiration 2 h.</p>
     </form>
   </main>
 </Base>
