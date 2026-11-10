@@ -1,9 +1,15 @@
 ---
+import type { Project } from '../../lib/schema';
+interface Props { projects: Project[] }
+const { projects } = Astro.props;
+// « En ligne » = lien public vers un site (pas un dépôt de code, pas une ancre interne).
+const online = projects.filter((p) => p.url.startsWith('https://') && !p.url.startsWith('https://github.com/')).length;
+const clients = projects.filter((p) => p.category === 'client').length;
 ---
 <section class="wrap facts" aria-label="En bref">
   <div class="tile f"><p class="k mono">BASÉ À</p><p class="v disp">Lomé, Togo</p><p class="s">GMT+0, aligné sur l’Europe</p></div>
   <div class="tile f"><p class="k mono">FORMATION</p><p class="v disp">Licence Génie Logiciel</p><p class="s">IPNET, Lomé · 2023 – 2026</p></div>
-  <div class="tile f"><p class="k mono">PROJETS</p><p class="v disp">2 en ligne · 1 en cours</p><p class="s">dont un client en freelance</p></div>
+  <div class="tile f"><p class="k mono">PROJETS</p><p class="v disp">{projects.length} projets · {online} en ligne</p><p class="s">{clients > 0 ? `dont ${clients === 1 ? 'un client' : `${clients} clients`} en freelance` : 'code source sur GitHub'}</p></div>
   <div class="tile f pk"><p class="k mono">OUTIL FÉTICHE</p><p class="v disp">L’IA, au quotidien</p><p class="s">agents de code, images, documents</p></div>
 </section>
 <section class="wrap term-wrap" aria-label="Terminal">

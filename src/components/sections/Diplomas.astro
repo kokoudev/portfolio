@@ -5,7 +5,7 @@ interface Props { items: Diploma[] }
 const { items } = Astro.props;
 ---
 <section id="diplomes" class="wrap section" aria-labelledby="diplomes-title">
-  <h2 id="diplomes-title" class="h2"><span class="eyebrow" aria-hidden="true">05 / DIPLÔMES</span>Diplômes<span class="pk">.</span></h2>
+  <h2 id="diplomes-title" class="h2"><span class="eyebrow" aria-hidden="true">06 / DIPLÔMES</span>Diplômes<span class="pk">.</span></h2>
   <ul class="list">
     {items.map((d) => {
       const f = resolveImage(d.file);

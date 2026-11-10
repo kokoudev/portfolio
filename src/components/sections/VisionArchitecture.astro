@@ -1,0 +1,113 @@
+---
+/**
+ * Schéma d'architecture de VISION. Deux tracés (large / vertical) pour rester lisible sur mobile.
+ * Les liaisons se dessinent quand le schéma entre à l'écran (aucun style en ligne : compatible CSP).
+ * Pointillés roses = prévu, pas encore implémenté.
+ */
+type Node = { x: number; y: number; w: number; h: number; t: string; s: string; planned?: boolean; core?: boolean };
+type Wire = { d: string; planned?: boolean };
+
+const wide: { nodes: Node[]; wires: Wire[] } = {
+  nodes: [
+    { x: 10, y: 20, w: 210, h: 74, t: 'App Flutter', s: 'mobile · Android / iOS' },
+    { x: 10, y: 150, w: 210, h: 74, t: 'Panneau admin web', s: 'interface séparée' },
+    { x: 10, y: 280, w: 210, h: 74, t: 'Boîtier ESP32', s: 'prévu · en prototypage', planned: true },
+    { x: 345, y: 150, w: 210, h: 74, t: 'API AdonisJS', s: 'backend', core: true },
+    { x: 345, y: 280, w: 210, h: 74, t: 'MQTT', s: 'prévu · messages boîtier', planned: true },
+    { x: 680, y: 150, w: 210, h: 74, t: 'Base de données', s: 'MySQL · Redis (prévu)' },
+  ],
+  wires: [
+    { d: 'M220 57 C 290 57, 280 170, 345 170' },
+    { d: 'M220 187 L 345 187' },
+    { d: 'M220 317 L 345 317', planned: true },
+    { d: 'M450 280 L 450 224', planned: true },
+    { d: 'M555 187 L 680 187' },
+  ],
+};
+
+const tall: { nodes: Node[]; wires: Wire[] } = {
+  nodes: [
+    { x: 6, y: 6, w: 166, h: 70, t: 'App Flutter', s: 'mobile' },
+    { x: 188, y: 6, w: 166, h: 70, t: 'Panneau admin', s: 'web, séparé' },
+    { x: 90, y: 150, w: 180, h: 70, t: 'API AdonisJS', s: 'backend', core: true },
+    { x: 6, y: 300, w: 166, h: 70, t: 'Base de données', s: 'MySQL · Redis prévu' },
+    { x: 188, y: 300, w: 166, h: 70, t: 'MQTT', s: 'prévu', planned: true },
+    { x: 188, y: 440, w: 166, h: 70, t: 'Boîtier ESP32', s: 'en prototypage', planned: true },
+  ],
+  wires: [
+    { d: 'M89 76 C 89 116, 150 110, 150 150' },
+    { d: 'M271 76 C 271 116, 210 110, 210 150' },
+    { d: 'M150 220 C 150 260, 89 260, 89 300' },
+    { d: 'M210 220 C 210 260, 271 260, 271 300', planned: true },
+    { d: 'M271 370 L 271 440', planned: true },
+  ],
+};
+
+const desc =
+  'L’application Flutter et le panneau d’administration web échangent avec l’API AdonisJS, qui lit et écrit dans la base MySQL. ' +
+  'Prévu : un cache Redis, et un boîtier ESP32 relié à l’API par MQTT.';
+---
+<figure class="arch" data-arch>
+  <figcaption class="mono cap">ARCHITECTURE · <span class="ok">━ en place</span> <span class="pl">┅ prévu</span></figcaption>
+  {[['wide', '0 0 900 374', wide], ['tall', '0 0 360 516', tall]].map(([cls, vb, g]) => {
+    const graph = g as typeof wide;
+    return (
+      <svg class={`svg ${cls}`} viewBox={vb as string} role="img" aria-label={`Architecture de VISION. ${desc}`}>
+        <defs>
+          <marker id={`a-${cls}`} viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="tip" /></marker>
+          <marker id={`p-${cls}`} viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="tip pk" /></marker>
+        </defs>
+        {graph.wires.map((w, i) => (
+          <path d={w.d} pathLength="1" class:list={['wire', `w${i}`, { planned: w.planned }]} marker-start={`url(#${w.planned ? 'p' : 'a'}-${cls})`} marker-end={`url(#${w.planned ? 'p' : 'a'}-${cls})`} />
+        ))}
+        {graph.nodes.map((n) => (
+          <g class:list={['node', { planned: n.planned, core: n.core }]}>
+            <rect x={n.x} y={n.y} width={n.w} height={n.h} />
+            <text x={n.x + 16} y={n.y + 32} class="t">{n.t}</text>
+            <text x={n.x + 16} y={n.y + 54} class="s">{n.s}</text>
+          </g>
+        ))}
+      </svg>
+    );
+  })}
+</figure>
+
+<script>
+  // Les liaisons se dessinent à l'entrée dans l'écran. Sans JS ou en mouvement réduit : tout est affiché.
+  const figs = document.querySelectorAll<HTMLElement>('[data-arch]');
+  if (figs.length && 'IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    }, { threshold: 0.2 });
+    figs.forEach((f) => { f.classList.add('armed'); io.observe(f); });
+  }
+</script>
+
+<style>
+  .arch{margin:0;flex:1 1 100%;padding:0 clamp(24px,3vw,36px) clamp(24px,3vw,36px)}
+  .cap{font-size:12px;letter-spacing:2px;color:var(--acc);margin-bottom:12px}
+  .cap .ok{color:var(--acc);margin-left:8px}.cap .pl{color:var(--punk-soft);margin-left:8px}
+  .svg{width:100%;height:auto;display:block;overflow:visible}
+  .wide{max-width:900px;margin:0 auto}
+  .tall{display:none;max-width:420px;margin:0 auto}
+  @media (max-width:700px){.wide{display:none}.tall{display:block}}
+  .node rect{fill:#0A1712;stroke:#3B5245;stroke-width:1.5}
+  .node.core rect{stroke:#B6FF5C;stroke-width:2}
+  .node.planned rect{stroke:#FF4FB8;stroke-dasharray:6 6}
+  .t{font-family:var(--f-body);font-weight:600;font-size:17px;fill:#F2FBF4}
+  .s{font-family:var(--f-mono);font-size:12px;fill:#A9BEB1}
+  .node.planned .s{fill:#FF8FCF}
+  .wire{fill:none;stroke:#B6FF5C;stroke-width:2}
+  .wire.planned{stroke:#FF4FB8;stroke-dasharray:.03 .025}
+  .tip{fill:#B6FF5C}.tip.pk{fill:#FF4FB8}
+  /* animation : le trait se dessine (pathLength = 1), les liaisons prévues apparaissent en fondu */
+  .armed .wire:not(.planned){stroke-dasharray:1;stroke-dashoffset:1}
+  .armed .wire.planned,.armed .tip{opacity:0}
+  .armed.in .tip{animation:show .4s ease .9s forwards}
+  .armed.in .wire:not(.planned){animation:draw 1s cubic-bezier(.3,.7,.2,1) forwards}
+  .armed.in .wire.planned{animation:show .6s ease forwards}
+  .armed.in .w1{animation-delay:.2s}.armed.in .w2{animation-delay:.4s}.armed.in .w3{animation-delay:.6s}.armed.in .w4{animation-delay:.8s}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  @keyframes show{to{opacity:1}}
+  @media (prefers-reduced-motion:reduce){.armed .wire:not(.planned){stroke-dashoffset:0}.armed .wire.planned,.armed .tip{opacity:1}}
+</style>

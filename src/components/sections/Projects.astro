@@ -1,6 +1,8 @@
 ---
 import Img from '../ui/Img.astro';
 import YouTube from '../ui/YouTube.astro';
+import Built from '../ui/Built.astro';
+import VisionArchitecture from './VisionArchitecture.astro';
 import type { Project } from '../../lib/schema';
 import type { Repo } from '../../lib/github';
 
@@ -24,7 +26,7 @@ const fmt = (d: string) => (d ? new Date(d).toLocaleDateString('fr-FR', { month:
   </div>
 
   {featured.map((p) => (
-    <article class="tile case reveal" data-cat={p.category}>
+    <article id={`projet-${p.id}`} class="tile case reveal" data-cat={p.category}>
       <div class="shots">
         {p.image && <div class="zoom main"><Img src={p.image} alt={p.imageAlt} widths={[480, 800, 1200]} sizes="(max-width: 900px) 100vw, 60vw" position="top-left" /></div>}
         {p.gallery.map((g) => <div class="zoom sub"><Img src={g.image} alt={g.alt} widths={[480, 800, 1200]} sizes="(max-width: 900px) 100vw, 60vw" /></div>)}
@@ -35,9 +37,12 @@ const fmt = (d: string) => (d ? new Date(d).toLocaleDateString('fr-FR', { month:
         {p.problem && <p class="pr"><span class="mono lbl pk">PROBLÈME →</span> {p.problem}</p>}
         {p.solution && <p class="pr"><span class="mono lbl ac">SOLUTION →</span> {p.solution}</p>}
         {!p.problem && <p class="pr">{p.description}</p>}
+        <Built items={p.built} title={p.title} />
+        {p.status && <p class="pr"><span class="mono lbl ac">STATUT ACTUEL →</span> {p.status}</p>}
         <p class="mono stack">{p.stack}</p>
         {p.url ? <a href={p.url} class="mono more" {...(isExternal(p.url) ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>{p.cta || 'Voir →'}</a> : <span class="todo">[ LIEN À AJOUTER ]</span>}
       </div>
+      {p.id === 'vision' && <VisionArchitecture />}
       {p.videos.length > 0 && (
         <div class="vids">
           {p.videos.map((v) => <YouTube id={v.youtubeId} title={v.title} />)}
@@ -48,7 +53,7 @@ const fmt = (d: string) => (d ? new Date(d).toLocaleDateString('fr-FR', { month:
 
   <div class="cards">
     {others.map((p, i) => (
-      <article class="tile card reveal" data-cat={p.category}>
+      <article id={`projet-${p.id}`} class="tile card reveal" data-cat={p.category}>
         {p.image && <div class="zoom thumb"><Img src={p.image} alt={p.imageAlt} widths={[400, 800]} sizes="(max-width: 700px) 100vw, 45vw" position="top" /></div>}
         <div class="cbody">
           <div class="row"><span class="disp outline num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span><span class={badgeClass(p)}>{p.badge}</span></div>
@@ -60,6 +65,8 @@ const fmt = (d: string) => (d ? new Date(d).toLocaleDateString('fr-FR', { month:
             </ul>
           )}
           {p.videos.map((v) => <YouTube id={v.youtubeId} title={v.title} />)}
+          <Built items={p.built} title={p.title} />
+          {p.status && <p class="desc"><span class="mono lbl ac">STATUT →</span> {p.status}</p>}
           <p class="mono stack">{p.stack}</p>
           {p.url ? <a href={p.url} class="mono more" {...(isExternal(p.url) ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>{p.cta || 'Voir →'}{isExternal(p.url) && <span class="sr-only"> (nouvel onglet)</span>}</a> : <span class="todo">[ LIEN À AJOUTER ]</span>}
         </div>
@@ -120,6 +127,7 @@ const fmt = (d: string) => (d ? new Date(d).toLocaleDateString('fr-FR', { month:
   .chip{font-size:13px;padding:12px 16px;min-height:44px;cursor:pointer;border:1px solid var(--line-3);background:transparent;color:var(--text-2);transition:background .2s,color .2s}
   .chip[aria-pressed='true']{background:var(--acc);border-color:var(--acc);color:var(--bg);font-weight:600}
   [hidden]{display:none!important}
+  .case,.card{scroll-margin-top:24px}
   .case{display:flex;flex-wrap:wrap;overflow:hidden;margin-bottom:20px}
   .shots{flex:999 1 560px;min-width:0;display:grid;gap:2px;background:var(--line)}
   .shots :global(img){width:100%;height:100%;object-fit:cover}

@@ -58,3 +58,7 @@
 .ad-actions{display:flex;gap:10px;flex-wrap:wrap}
 .ad-primary{background:var(--acc);color:var(--bg);border:0;font-weight:600;font-size:14px;padding:14px 22px;min-height:44px;cursor:pointer}
 .ad-primary:disabled{opacity:.5;cursor:not-allowed}
+/* Couches « Ce que j'ai construit » */
+.ad-built select,.ad-vidadd select{width:auto;flex:0 0 auto;background:var(--bg);border:1px solid var(--line-3);color:var(--text);font:inherit;font-size:14px;padding:9px 11px;min-height:44px}
+.ad-galrow label input,.ad-vidadd label input{flex:none;width:18px;height:18px;min-height:0;padding:0;accent-color:var(--acc)}
+.ad-galrow label,.ad-vidadd label{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}

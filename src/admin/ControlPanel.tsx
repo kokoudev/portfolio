@@ -9,6 +9,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { api, initSession } from './api';
 import { emptyItem, fields, summary, tabs, type Field } from './fields';
 import type { CollectionName, Content } from '../lib/schema';
+import { LAYERS, LAYER_LABEL, type Layer } from '../lib/layers';
 import './panel.css';
 
 type Item = Record<string, unknown> & { id: string };
@@ -305,6 +306,7 @@ function ItemForm({ fields, initial, isNew, onSubmit, onCancel, setStatus }: {
               <GalleryField id={id} accept={f.accept} items={(v as GalleryItem[]) ?? []} onChange={(g) => set(f.name, g)} uploading={uploading} setUploading={setUploading} setStatus={setStatus} />
             )}
             {f.type === 'videos' && <VideosField id={id} items={(v as VideoItem[]) ?? []} onChange={(list) => set(f.name, list)} />}
+            {f.type === 'built' && <BuiltField id={id} items={(v as BuiltItem[]) ?? []} onChange={(list) => set(f.name, list)} />}
             {f.hint && <p className="mono ad-hint">{f.hint}</p>}
           </div>
         );
@@ -424,6 +426,45 @@ function VideosField({ id, items, onChange }: { id: string; items: VideoItem[]; 
           onClick={() => { onChange([...items, { youtubeId: vid, title: title.trim() || 'Vidéo' }]); setLink(''); setTitle(''); }}>+ Ajouter la vidéo</button>
       </div>
       <p className="mono ad-ref">{link && !vid ? 'Lien YouTube non reconnu' : 'Vidéo « non répertoriée » conseillée · chargée seulement au clic sur le site'}</p>
+    </div>
+  );
+}
+
+type BuiltItem = { layer: Layer; detail: string; planned: boolean };
+
+function BuiltField({ id, items, onChange }: { id: string; items: BuiltItem[]; onChange: (v: BuiltItem[]) => void }) {
+  const [layer, setLayer] = useState<Layer>('interface');
+  const [detail, setDetail] = useState('');
+  const [planned, setPlanned] = useState(false);
+  const patch = (i: number, p: Partial<BuiltItem>) => onChange(items.map((x, j) => (j === i ? { ...x, ...p } : x)));
+  return (
+    <div className="ad-gal">
+      {items.length === 0 && <p className="mono ad-ref">Aucune couche pour l’instant.</p>}
+      <ul>
+        {items.map((b, i) => (
+          <li key={i} className="ad-galrow ad-built">
+            <select aria-label={`Couche ${i + 1}`} value={b.layer} onChange={(e) => patch(i, { layer: e.target.value as Layer })}>
+              {LAYERS.map((l) => <option key={l} value={l}>{LAYER_LABEL[l]}</option>)}
+            </select>
+            <input aria-label={`Détail de la couche ${i + 1}`} value={b.detail} maxLength={160} onChange={(e) => patch(i, { detail: e.target.value })} />
+            <label className="mono ad-ref"><input type="checkbox" checked={b.planned} onChange={(e) => patch(i, { planned: e.target.checked })} /> prévu</label>
+            <div className="ad-galbtns">
+              <button type="button" className="ad-btn mono" aria-label={`Monter la couche ${i + 1}`} disabled={i === 0} onClick={() => onChange(move(items, i, -1))}>↑</button>
+              <button type="button" className="ad-btn mono" aria-label={`Descendre la couche ${i + 1}`} disabled={i === items.length - 1} onClick={() => onChange(move(items, i, 1))}>↓</button>
+              <button type="button" className="ad-btn danger mono" aria-label={`Retirer la couche ${i + 1}`} onClick={() => onChange(items.filter((_, j) => j !== i))}>✕</button>
+            </div>
+          </li>
+        ))}
+      </ul>
+      <div className="ad-vidadd">
+        <select id={id} aria-label="Couche à ajouter" value={layer} onChange={(e) => setLayer(e.target.value as Layer)}>
+          {LAYERS.map((l) => <option key={l} value={l}>{LAYER_LABEL[l]}</option>)}
+        </select>
+        <input aria-label="Détail de la nouvelle couche" type="text" placeholder="Ex. API AdonisJS" value={detail} maxLength={160} onChange={(e) => setDetail(e.target.value)} />
+        <label className="mono ad-ref"><input type="checkbox" checked={planned} onChange={(e) => setPlanned(e.target.checked)} /> prévu</label>
+        <button type="button" className="ad-btn mono" disabled={!detail.trim() || items.length >= 12}
+          onClick={() => { onChange([...items, { layer, detail: detail.trim(), planned }]); setDetail(''); setPlanned(false); }}>+ Ajouter la couche</button>
+      </div>
     </div>
   );
 }

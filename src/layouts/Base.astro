@@ -14,8 +14,8 @@ interface Props {
   withFaq?: boolean;
 }
 const {
-  title = 'kokoudev — SOEDJE Kokou Ariel Caesar, dev full-stack à Lomé',
-  description = 'kokoudev, c’est SOEDJE Kokou Ariel Caesar : développeur web & full-stack junior à Lomé (Togo). Projets, certifications Stanford et Cisco, Licence IPNET.',
+  title = 'kokoudev — SOEDJE Kokou Ariel Caesar, développeur web & mobile à Lomé',
+  description = 'kokoudev, c’est SOEDJE Kokou Ariel Caesar : développeur web & mobile à Lomé (Togo). Du site vitrine à l’application connectée : projets, certifications Stanford et Cisco, Licence IPNET.',
   noindex = false,
   content,
   withFaq = false,
@@ -62,7 +62,7 @@ const jsonLd = buildJsonLd(site, ogUrl, content);
     <meta property="og:image" content={ogUrl} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="kokoudev — SOEDJE Kokou Ariel Caesar, développeur web & full-stack à Lomé" />
+    <meta property="og:image:alt" content="kokoudev — SOEDJE Kokou Ariel Caesar, développeur web & mobile à Lomé" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />

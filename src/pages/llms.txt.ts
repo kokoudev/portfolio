@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { readContent } from '../lib/store';
 import { identity, faq } from '../lib/seo';
+import { LAYER_LABEL } from '../lib/layers';
 
 export const prerender = false;
 
@@ -24,7 +25,10 @@ export const GET: APIRoute = async ({ site }) => {
     `- Compétences : ${identity.skills.join(', ')}`,
     '',
     '## Projets',
-    ...c.projects.map((p) => `- [${p.title}](${link(p.url) || base + '/#projets'}) — ${p.badge}. ${p.description} Technologies : ${p.stack}.`),
+    ...c.projects.map((p) => {
+      const built = p.built.map((b) => `${LAYER_LABEL[b.layer]} : ${b.detail}${b.planned ? ' (prévu)' : ''}`).join(' ; ');
+      return `- [${p.title}](${link(p.url) || `${base}/#projet-${p.id}`}) — ${p.badge}. ${p.description} Technologies : ${p.stack}.${built ? ` Ce qu’il a construit : ${built}.` : ''}${p.status ? ` Statut : ${p.status}.` : ''}`;
+    }),
     '',
     '## Formation (du plus ancien au plus récent)',
     ...c.formations.map((f) => `- ${f.year} — ${f.title}, ${f.school}${f.detail ? ` (${f.detail})` : ''}`),

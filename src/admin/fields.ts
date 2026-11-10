@@ -1,6 +1,6 @@
 import type { CollectionName } from '../lib/schema';
 
-export type FieldType = 'text' | 'textarea' | 'url' | 'select' | 'checkbox' | 'file' | 'gallery' | 'videos';
+export type FieldType = 'text' | 'textarea' | 'url' | 'select' | 'checkbox' | 'file' | 'gallery' | 'videos' | 'built';
 export interface Field {
   name: string;
   label: string;
@@ -31,6 +31,8 @@ export const fields: Record<CollectionName, Field[]> = {
     { name: 'problem', label: 'Problème (étude de cas)', type: 'textarea' },
     { name: 'solution', label: 'Solution (étude de cas)', type: 'textarea' },
     { name: 'stack', label: 'Technologies', type: 'text' },
+    { name: 'built', label: 'Ce que j’ai construit (une ligne par couche réelle)', type: 'built', hint: 'N’ajoutez que les couches qui existent vraiment ; cochez « prévu » pour ce qui n’est pas encore implémenté.' },
+    { name: 'status', label: 'Statut actuel (étude de cas)', type: 'text' },
     { name: 'url', label: 'Lien (https://…)', type: 'url' },
     { name: 'cta', label: 'Texte du lien', type: 'text' },
     { name: 'image', label: 'Capture', type: 'file', accept: IMG, hint: 'Vérifiez qu’aucun numéro de téléphone n’apparaît sur la capture.' },
@@ -69,7 +71,7 @@ export function emptyItem(c: CollectionName): Record<string, unknown> {
     base[f.name] =
       f.type === 'checkbox' ? false
       : f.type === 'select' ? f.options?.[0]?.[0]
-      : f.type === 'gallery' || f.type === 'videos' ? []
+      : f.type === 'gallery' || f.type === 'videos' || f.type === 'built' ? []
       : '';
   }
   return base;
@@ -80,7 +82,7 @@ export function summary(c: CollectionName, it: Record<string, unknown>): { title
   switch (c) {
     case 'projects': {
       const n = (k: string) => (Array.isArray(it[k]) ? (it[k] as unknown[]).length : 0);
-      const extras = [n('gallery') ? `${n('gallery')} capture(s)` : '', n('videos') ? `${n('videos')} vidéo(s)` : ''];
+      const extras = [n('built') ? `${n('built')} couche(s)` : '', n('gallery') ? `${n('gallery')} capture(s)` : '', n('videos') ? `${n('videos')} vidéo(s)` : ''];
       return { title: s('title'), meta: [s('badge'), s('stack'), ...extras].filter(Boolean).join(' · ') };
     }
     case 'formations': return { title: s('title'), meta: [s('year'), s('school')].filter(Boolean).join(' · ') };
