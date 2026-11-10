@@ -46,6 +46,8 @@ export default defineConfig({
         "form-action 'self'",
         "manifest-src 'self'",
         "worker-src 'self'",
+        "frame-ancestors 'none'",
+        "upgrade-insecure-requests",
       ],
       scriptDirective: {
         resources: ["'self'", 'https://challenges.cloudflare.com'],

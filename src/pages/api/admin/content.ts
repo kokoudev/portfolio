@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import { purgeCache } from '@netlify/cache';
 import { contentSchema } from '../../../lib/schema';
 import { readContent, writeContent } from '../../../lib/store';
-import { json } from '../../../lib/security';
+import { json, readText } from '../../../lib/security';
 
 export const prerender = false;
 const MAX_BODY = 512 * 1024;
@@ -12,8 +12,8 @@ export const GET: APIRoute = async () => json(await readContent());
 /** Remplace tout le contenu (ajout, modification, suppression, réordonnancement). Validé strictement. */
 export const PUT: APIRoute = async ({ request }) => {
   if (!(request.headers.get('content-type') ?? '').includes('application/json')) return json({ error: 'Format invalide' }, 415);
-  const raw = await request.text();
-  if (raw.length > MAX_BODY) return json({ error: 'Contenu trop volumineux' }, 413);
+  const raw = await readText(request, MAX_BODY);
+  if (raw === null) return json({ error: 'Contenu trop volumineux' }, 413);
   let data: unknown;
   try {
     data = JSON.parse(raw);

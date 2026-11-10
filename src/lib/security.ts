@@ -69,6 +69,51 @@ export async function resetRateLimit(scope: string, key: string) {
   await securityStore().delete(`rl/${scope}/${key}`);
 }
 
+/**
+ * Lit le corps de la requête en comptant les octets réellement reçus : on s'arrête dès que `max`
+ * est dépassé, même si l'en-tête Content-Length ment. Renvoie null si trop volumineux.
+ */
+export async function readBody(request: Request, max: number): Promise<Uint8Array<ArrayBuffer> | null> {
+  if (!request.body) return new Uint8Array(0);
+  const reader = request.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > max) {
+      await reader.cancel().catch(() => {});
+      return null;
+    }
+    chunks.push(value);
+  }
+  const out = new Uint8Array(size);
+  let off = 0;
+  for (const c of chunks) {
+    out.set(c, off);
+    off += c.byteLength;
+  }
+  return out;
+}
+
+/** Corps borné → texte (JSON). */
+export async function readText(request: Request, max: number): Promise<string | null> {
+  const b = await readBody(request, max);
+  return b === null ? null : new TextDecoder().decode(b);
+}
+
+/** Corps borné → FormData (null si trop volumineux, 'invalid' si illisible). */
+export async function readForm(request: Request, max: number): Promise<FormData | null | 'invalid'> {
+  const b = await readBody(request, max);
+  if (b === null) return null;
+  try {
+    return await new Response(b, { headers: { 'content-type': request.headers.get('content-type') ?? '' } }).formData();
+  } catch {
+    return 'invalid';
+  }
+}
+
 /** Vérifie que la requête provient bien de notre propre origine (anti-CSRF). */
 export function sameOrigin(request: Request, url: URL): boolean {
   const origin = request.headers.get('origin');

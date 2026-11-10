@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import { randomBytes } from 'node:crypto';
 import { purgeCache } from '@netlify/cache';
 import { mediaStore } from '../../../lib/store';
-import { json, MAX_UPLOAD_BYTES, sniffType } from '../../../lib/security';
+import { json, MAX_UPLOAD_BYTES, readForm, sniffType } from '../../../lib/security';
 
 export const prerender = false;
 
@@ -11,12 +11,9 @@ export const POST: APIRoute = async ({ request }) => {
   const lenHeader = request.headers.get('content-length');
   if (!lenHeader) return json({ error: 'Longueur requise' }, 411);
   if (Number(lenHeader) > MAX_UPLOAD_BYTES + 64 * 1024) return json({ error: 'Fichier trop lourd (5 Mo max)' }, 413);
-  let form: FormData;
-  try {
-    form = await request.formData();
-  } catch {
-    return json({ error: 'Formulaire invalide' }, 400);
-  }
+  const form = await readForm(request, MAX_UPLOAD_BYTES + 64 * 1024);
+  if (form === null) return json({ error: 'Fichier trop lourd (5 Mo max)' }, 413);
+  if (form === 'invalid') return json({ error: 'Formulaire invalide' }, 400);
   const file = form.get('file');
   if (!(file instanceof File)) return json({ error: 'Aucun fichier' }, 400);
   if (file.size === 0 || file.size > MAX_UPLOAD_BYTES) return json({ error: 'Fichier vide ou trop lourd (5 Mo max)' }, 413);

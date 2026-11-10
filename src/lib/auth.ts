@@ -44,6 +44,14 @@ export function safeEqual(a: string, b: string): boolean {
 
 /* ---------------- Sessions PASETO v4.local ---------------- */
 
+/**
+ * Empreinte du mot de passe en vigueur, stockée dans le jeton. Changer ADMIN_PASSWORD_HASH
+ * invalide donc immédiatement toutes les sessions ouvertes (même un cookie volé).
+ */
+function passwordVersion(): string {
+  return createHash('sha256').update(`pv:${secret('ADMIN_PASSWORD_HASH')}`).digest('base64url').slice(0, 22);
+}
+
 export interface Session {
   sub: string;
   jti: string;
@@ -57,6 +65,7 @@ export async function createSession(cookies: AstroCookies, username: string): Pr
     sub: username,
     jti: randomBytes(16).toString('base64url'),
     csrf: randomBytes(24).toString('base64url'),
+    pv: passwordVersion(),
     iat: new Date(now).toISOString(),
     nbf: new Date(now).toISOString(),
     exp: new Date(now + SESSION_TTL_S * 1000).toISOString(),
@@ -84,7 +93,7 @@ export async function readSession(cookies: AstroCookies): Promise<Session | null
   const token = cookies.get(SESSION_COOKIE)?.value;
   if (!token || token.length > 2048 || !token.startsWith('v4.local.')) return null;
   try {
-    const { payload } = await decrypt<{ sub: string; jti: string; csrf: string; exp: string; aud: string; iss: string }>(
+    const { payload } = await decrypt<{ sub: string; jti: string; csrf: string; exp: string; aud: string; iss: string; pv?: string }>(
       secret('PASETO_LOCAL_KEY'),
       token,
       { assertion: IMPLICIT_ASSERTION, maxDepth: 4, maxKeys: 16 },
@@ -92,6 +101,7 @@ export async function readSession(cookies: AstroCookies): Promise<Session | null
     if (payload.aud !== 'portfolio-admin' || payload.iss !== 'portfolio') return null;
     if (!payload.exp || Date.parse(payload.exp) <= Date.now()) return null;
     if (!safeEqual(payload.sub, secret('ADMIN_USERNAME'))) return null;
+    if (typeof payload.pv !== 'string' || !safeEqual(payload.pv, passwordVersion())) return null;
     if (await securityStore().get(`revoked/${payload.jti}`)) return null;
     return { sub: payload.sub, jti: payload.jti, csrf: payload.csrf, exp: payload.exp };
   } catch {
