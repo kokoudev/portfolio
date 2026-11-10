@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { z } from 'zod';
 import { createSession, purgeExpiredRevocations, safeEqual, secret, verifyPassword } from '../../../lib/auth';
-import { ipKey, isLimited, json, rateLimit, resetRateLimit, verifyTurnstile } from '../../../lib/security';
+import { ipKey, isLimited, json, rateLimit, readText, resetRateLimit, verifyTurnstile } from '../../../lib/security';
 
 export const prerender = false;
 
@@ -19,8 +19,10 @@ const MAX_FAILS = 5;
  * Ordre volontaire :
  * 1. l'IP (regroupée /64 en IPv6) est-elle déjà bloquée ?  → 429
  * 2. Turnstile (action « login » + nom d'hôte)            → 400
- * 3. mot de passe scrypt en temps constant
- * 4. SEULS les échecs sont comptés : 5 échecs / 15 min → blocage 30 min pour cette IP.
+ * 3. la tentative est comptée de façon atomique AVANT scrypt (des requêtes parallèles ne passent pas
+ *    toutes), puis le compteur est remis à zéro si la connexion réussit : seuls les échecs restent
+ *    comptés. 5 échecs / 15 min → blocage 30 min pour cette IP.
+ * 4. mot de passe scrypt en temps constant
  * Aucun verrou global : un attaquant ne peut pas empêcher le propriétaire de se connecter.
  */
 export const POST: APIRoute = async ({ request, cookies, clientAddress, url }) => {
@@ -29,8 +31,8 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress, url }) =
   if (limited.limited) return json({ error: 'Trop de tentatives. Réessayez plus tard.' }, 429, { 'Retry-After': String(limited.retryAfter) });
 
   if (!(request.headers.get('content-type') ?? '').includes('application/json')) return json({ error: 'Format invalide' }, 415);
-  const raw = await request.text();
-  if (raw.length > 8192) return json({ error: 'Requête trop volumineuse' }, 413);
+  const raw = await readText(request, 8192);
+  if (raw === null) return json({ error: 'Requête trop volumineuse' }, 413);
   let data: unknown = null;
   try { data = JSON.parse(raw); } catch { /* invalide */ }
   const parsed = body.safeParse(data);
@@ -50,14 +52,15 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress, url }) =
     return json({ error: 'Administration non configurée' }, 503);
   }
 
+  const r = await rateLimit('login-fail', ip, MAX_FAILS, 15 * 60_000, 30 * 60_000);
+  if (!r.ok) return json({ error: 'Trop de tentatives. Réessayez plus tard.' }, 429, { 'Retry-After': String(r.retryAfter) });
+
   const userOk = safeEqual(parsed.data.username, expectedUser);
   const pwOk = await verifyPassword(parsed.data.password, userOk ? hash : DUMMY_HASH);
   if (!userOk || !pwOk) {
-    const r = await rateLimit('login-fail', ip, MAX_FAILS, 15 * 60_000, 30 * 60_000);
     const g = await rateLimit('login-fail-global', 'all', 100, 60 * 60_000);
     if (!g.ok) console.warn('[login] plus de 100 échecs de connexion en une heure : attaque probable');
     await new Promise((res) => setTimeout(res, 300 + Math.random() * 400));
-    if (!r.ok) return json({ error: 'Trop de tentatives. Réessayez plus tard.' }, 429, { 'Retry-After': String(r.retryAfter) });
     return json({ error: 'Identifiants invalides' }, 401);
   }
 

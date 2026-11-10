@@ -4,7 +4,7 @@ Portfolio personnel de **SOEDJE Kokou Ariel Caesar**, développeur web & mobile 
 
 Esthétique « solarpunk + punk » : fond quadrillé `#07100D`, vert néon `#B6FF5C`, rose `#FF4FB8`, polices Unbounded / Space Grotesk / JetBrains Mono (auto-hébergées), lianes SVG qui poussent, feuilles qui éclosent, spores lumineuses, orbite autour de la photo. Toutes les animations respectent `prefers-reduced-motion`.
 
-**Stack** : [Astro 6](https://astro.build) (rendu serveur) + îlots React 19 · [Netlify](https://www.netlify.com) (Functions, Blobs, Image CDN) · [Cloudflare Turnstile](https://www.cloudflare.com/products/turnstile/) · sessions [PASETO v4.local](https://paseto.io).
+**Stack** : [Astro 7](https://astro.build) (rendu serveur) + îlots React 19 · [Netlify](https://www.netlify.com) (Functions, Blobs, Image CDN) · [Cloudflare Turnstile](https://www.cloudflare.com/products/turnstile/) · sessions [PASETO v4.local](https://paseto.io).
 
 ---
 
@@ -135,7 +135,7 @@ La session admin utilise un cookie `__Host-` lié au domaine : après le changem
 6. **Messages** : les messages du formulaire de contact arrivent ici.
 7. **Se déconnecter** révoque la session côté serveur. Une session expire de toute façon après 2 h.
 
-**Changer de mot de passe** : relancez `node scripts/setup-admin.mjs`, remplacez les variables sur Netlify, redéployez. Changer `PASETO_LOCAL_KEY` déconnecte immédiatement toutes les sessions.
+**Changer de mot de passe** : relancez `node scripts/setup-admin.mjs`, remplacez les variables sur Netlify, redéployez : toutes les sessions ouvertes sont alors invalidées (le jeton contient une empreinte du mot de passe en vigueur). Changer `PASETO_LOCAL_KEY` a le même effet.
 
 ## Sécurité
 
