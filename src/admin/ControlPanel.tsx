@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Component, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
   DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent,
 } from '@dnd-kit/core';
@@ -9,7 +9,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { api, initSession } from './api';
 import { emptyItem, fields, summary, tabs, type Field } from './fields';
 import type { CollectionName, Content } from '../lib/schema';
-import './admin.css';
+import './panel.css';
 
 type Item = Record<string, unknown> & { id: string };
 type Tab = (typeof tabs)[number]['key'];
@@ -20,7 +20,37 @@ function slug(s: string) {
   return `${base}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
-export default function AdminApp({ user }: { user: string }) {
+/** Si un écran plante, on affiche l'erreur au lieu d'une page vide. */
+class Boundary extends Component<{ children: ReactNode }, { error: string | null }> {
+  state = { error: null as string | null };
+  static getDerivedStateFromError(e: Error) {
+    return { error: e.message || 'Erreur inconnue' };
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="ad" role="alert">
+          <main className="ad-main">
+            <h1 className="disp">Un problème est survenu</h1>
+            <p className="mono ad-status err">{this.state.error}</p>
+            <button type="button" className="mono ad-primary" onClick={() => location.reload()}>Recharger</button>
+          </main>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+export default function ControlPanel(props: { user: string }) {
+  return (
+    <Boundary>
+      <Panel {...props} />
+    </Boundary>
+  );
+}
+
+function Panel({ user }: { user: string }) {
   const [tab, setTab] = useState<Tab>('projects');
   const [content, setContent] = useState<Content | null>(null);
   const [editing, setEditing] = useState<{ index: number; item: Item } | null>(null);

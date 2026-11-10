@@ -1,6 +1,6 @@
 import type { ImageMetadata } from 'astro';
 import portrait from '../assets/photo/portrait.jpg';
-import visionAdmin from '../assets/projects/vision-admin.png';
+import visionAdmin from '../assets/projects/vision-dashboard.png';
 import visionTracking from '../assets/projects/vision-tracking.png';
 import gamedi from '../assets/projects/gamedi.png';
 import stanfordDC from '../assets/certs/stanford-divide-conquer.jpg';

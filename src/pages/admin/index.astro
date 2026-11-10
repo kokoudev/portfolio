@@ -1,12 +1,56 @@
 ---
 import Base from '../../layouts/Base.astro';
-import AdminApp from '../../admin/AdminApp';
+import ControlPanel from '../../admin/ControlPanel';
 
 export const prerender = false;
 // La session est vérifiée par le middleware avant d'arriver ici.
 const user = Astro.locals.session?.sub ?? '';
 ---
-<Base title="Admin — Portfolio" noindex>
-  <AdminApp client:only="react" user={user} />
-  <noscript><p>L’administration nécessite JavaScript.</p></noscript>
+<Base title="Espace de gestion — kokoudev" noindex>
+  <ControlPanel client:only="react" user={user}>
+    <div slot="fallback" class="boot" data-boot>
+      <p class="mono">Chargement de l’espace de gestion…</p>
+    </div>
+  </ControlPanel>
+  <div class="boot fail" data-boot-fail hidden role="alert">
+    <p class="disp">L’espace de gestion ne s’est pas chargé.</p>
+    <p>Une extension du navigateur (bloqueur de publicité, antitraqueur…) bloque probablement le script.</p>
+    <ul>
+      <li>Ouvrez cette page dans une <strong>fenêtre de navigation privée</strong>, ou</li>
+      <li>désactivez vos extensions pour <strong>kokoudev.netlify.app</strong>, puis rechargez.</li>
+    </ul>
+    <p class="mono err" data-boot-err></p>
+  </div>
+  <noscript><p class="boot">L’espace de gestion nécessite JavaScript.</p></noscript>
 </Base>
+
+<script>
+  // Diagnostic : si l'interface n'a pas démarré après 8 s, on explique pourquoi au lieu d'une page vide.
+  const errors: string[] = [];
+  addEventListener('error', (e) => {
+    const t = e.target as HTMLElement | null;
+    if (t && t !== (window as unknown as HTMLElement) && 'src' in t) errors.push(`Ressource bloquée : ${(t as HTMLScriptElement).src}`);
+    else if (e.message) errors.push(e.message);
+  }, true);
+  addEventListener('unhandledrejection', (e) => errors.push(String(e.reason?.message ?? e.reason)));
+  setTimeout(() => {
+    const started = document.querySelector('.ad');
+    if (started) return;
+    document.querySelector<HTMLElement>('[data-boot]')?.remove();
+    const box = document.querySelector<HTMLElement>('[data-boot-fail]');
+    if (!box) return;
+    box.hidden = false;
+    const err = box.querySelector<HTMLElement>('[data-boot-err]');
+    if (err) err.textContent = errors.slice(0, 3).join(' · ');
+  }, 8000);
+</script>
+
+<style>
+  .boot{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:14px;padding:24px;text-align:center;color:var(--text-2)}
+  .boot .mono{color:var(--acc);font-size:14px}
+  .fail{max-width:640px;margin:0 auto;align-items:flex-start;text-align:left}
+  .fail .disp{font-size:24px;font-weight:800;color:var(--text-strong)}
+  .fail ul{margin:0;padding-left:20px;line-height:1.8}
+  .fail strong{color:var(--acc)}
+  .err{font-size:12px;color:var(--punk-soft);overflow-wrap:anywhere}
+</style>
