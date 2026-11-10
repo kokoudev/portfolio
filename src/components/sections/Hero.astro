@@ -2,96 +2,97 @@
 import { Picture } from 'astro:assets';
 import portrait from '../../assets/photo/portrait.jpg';
 ---
-<section id="top" class="hero wrap" aria-labelledby="hero-title">
+<section id="top" class="hero" aria-labelledby="hero-title">
   <span class="spore s1" aria-hidden="true"></span>
   <span class="spore pk s2" aria-hidden="true"></span>
   <span class="spore s3" aria-hidden="true"></span>
   <span class="spore pk s4" aria-hidden="true"></span>
   <span class="spore s5" aria-hidden="true"></span>
+  <div class="wrap inner">
+    <p class="status mono rise r1"><span class="dot pulse" aria-hidden="true"></span>DISPONIBLE · LOMÉ (GMT+0) · SUR SITE OU À DISTANCE</p>
 
-  <p class="status mono rise r1"><span class="dot pulse" aria-hidden="true"></span>DISPONIBLE · LOMÉ (GMT+0) · SUR SITE OU À DISTANCE</p>
-
-  <div class="grid">
-    <div class="txt">
-      <h1 id="hero-title" class="disp">
-        <span class="name rise r1">SOEDJE Kokou Ariel Caesar <span class="alias mono">alias kokoudev</span></span>
-        <span class="big rise r2">JE FAIS</span>
-        <span class="big outline rise r3">POUSSER</span>
-        <span class="big rise r4">DU CODE<span class="punk">.</span></span>
-      </h1>
-    </div>
-
-    <div class="visual rise r3">
-      <svg class="deco" viewBox="0 0 460 500" aria-hidden="true">
-        <defs>
-          <radialGradient id="sun" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stop-color="#B6FF5C" stop-opacity=".55" />
-            <stop offset="60%" stop-color="#B6FF5C" stop-opacity=".1" />
-            <stop offset="100%" stop-color="#B6FF5C" stop-opacity="0" />
-          </radialGradient>
-        </defs>
-        <circle cx="230" cy="220" r="190" fill="url(#sun)" class="halo" />
-        <g class="orbit"><circle cx="230" cy="220" r="178" fill="none" stroke="#FF4FB8" stroke-width="1.5" stroke-dasharray="4 12" /><circle cx="408" cy="220" r="7" fill="#FF4FB8" /></g>
-        <g class="orbit rev"><circle cx="230" cy="220" r="152" fill="none" stroke="#B6FF5C" stroke-opacity=".45" stroke-width="1" stroke-dasharray="1 8" /><circle cx="230" cy="68" r="5" fill="#B6FF5C" /></g>
-        <path class="vine" d="M50 500 C 66 420, 14 372, 76 318 S 128 236, 112 168" stroke="#B6FF5C" stroke-width="3" />
-        <path class="vine d2" d="M420 500 C 400 440, 450 392, 388 336 S 350 270, 360 230" stroke="#B6FF5C" stroke-width="3" />
-        <path class="vine d3" d="M232 500 C 238 460, 214 428, 232 396" stroke="#FF4FB8" stroke-width="2" />
-        <path class="leaf lf1" d="M76 318 q -36 -6 -44 -40 q 34 4 44 40 z" fill="#B6FF5C" />
-        <path class="leaf lf2" d="M112 168 q 30 -14 50 4 q -28 20 -50 -4 z" fill="#7CD63B" />
-        <path class="leaf lf3" d="M388 336 q 34 -12 46 -44 q -34 2 -46 44 z" fill="#FF4FB8" />
-        <path class="leaf lf4" d="M60 440 q 30 -20 56 -6 q -24 26 -56 6 z" fill="#7CD63B" />
-        <path class="leaf lf5" d="M410 450 q -32 -18 -58 -2 q 26 24 58 2 z" fill="#B6FF5C" />
-      </svg>
-      <div class="photo">
-        <Picture
-          src={portrait}
-          alt="Portrait de SOEDJE Kokou Ariel Caesar"
-          formats={['avif', 'webp']}
-          widths={[240, 360, 600]}
-          sizes="(max-width: 600px) 60vw, 300px"
-          loading="eager"
-          fetchpriority="high"
-        />
+    <div class="grid">
+      <div class="txt">
+        <h1 id="hero-title" class="disp">
+          <span class="big rise r1">JE CRÉE DES SITES</span>
+          <span class="big rise r2">ET DES <span class="outline">APPLIS</span></span>
+          <span class="big rise r3">QUI MARCHENT<span class="punk">.</span></span>
+        </h1>
+        <p class="sub rise r4">
+          <strong>SOEDJE Kokou Ariel Caesar</strong> — développeur web &amp; mobile à Lomé. Du site vitrine à l’application connectée.
+          <span class="alias mono">alias kokoudev</span>
+        </p>
+        <div class="ctas rise r5">
+          <a href="#projets" class="btn btn--acc">Voir mes projets ↓</a>
+          <a href="#contact" class="btn">Me contacter</a>
+        </div>
       </div>
-      <p class="tag mono">SOEDJE K. A. CAESAR</p>
+
+      <div class="visual rise r3">
+        <svg class="deco" viewBox="0 0 460 460" aria-hidden="true">
+          <defs>
+            <radialGradient id="sun" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#B6FF5C" stop-opacity=".45" />
+              <stop offset="60%" stop-color="#B6FF5C" stop-opacity=".08" />
+              <stop offset="100%" stop-color="#B6FF5C" stop-opacity="0" />
+            </radialGradient>
+          </defs>
+          <circle cx="230" cy="230" r="200" fill="url(#sun)" class="halo" />
+          <g class="orbit"><circle cx="230" cy="230" r="212" fill="none" stroke="#FF4FB8" stroke-width="1.5" stroke-dasharray="4 12" /><circle cx="442" cy="230" r="7" fill="#FF4FB8" /></g>
+        </svg>
+        <div class="photo">
+          <Picture
+            src={portrait}
+            alt="Portrait de SOEDJE Kokou Ariel Caesar"
+            formats={['avif', 'webp']}
+            widths={[240, 360, 600]}
+            sizes="(max-width: 600px) 180px, 320px"
+            loading="eager"
+            fetchpriority="high"
+          />
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="foot rise r5">
-    <p class="lead">
-      <strong>Développeur web &amp; full-stack junior</strong> à Lomé. Je conçois des produits utiles pour
-      l’Afrique de l’Ouest : du site vitrine au boîtier connecté qui coupe le moteur d’une moto volée.
-    </p>
-    <div class="ctas">
-      <a href="#projets" class="btn btn--acc">Voir les projets ↓</a>
-      <a href="#contact" class="btn">Me contacter</a>
-    </div>
-  </div>
+  <!-- Décor : lianes qui poussent en bas de l'accueil, loin de la photo -->
+  <svg class="ground" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
+    <path class="vine" d="M0 112 C 160 100, 220 60, 360 74 S 600 112, 760 92 S 1040 50, 1180 78 S 1380 104, 1440 96" stroke="#B6FF5C" stroke-width="2.5" />
+    <path class="vine d2" d="M0 118 C 200 112, 330 92, 520 102 S 900 118, 1100 104 S 1360 98, 1440 110" stroke="#FF4FB8" stroke-width="1.5" />
+    <path class="leaf lf1" d="M360 74 q -30 -8 -36 -34 q 28 6 36 34 z" fill="#B6FF5C" />
+    <path class="leaf lf2" d="M760 92 q 26 -16 48 -4 q -22 22 -48 4 z" fill="#7CD63B" />
+    <path class="leaf lf3" d="M1180 78 q 28 -10 38 -38 q -28 2 -38 38 z" fill="#FF4FB8" />
+  </svg>
 </section>
 
 <style>
-  .hero{padding-top:clamp(24px,5vw,48px);padding-bottom:24px}
-  .status{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--acc);letter-spacing:2px;margin-bottom:28px;flex-wrap:wrap}
+  .hero{position:relative;overflow:hidden;padding-bottom:clamp(72px,9vw,120px)}
+  .inner{padding-top:clamp(20px,4vw,44px)}
+  .status{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--acc);letter-spacing:2px;margin-bottom:clamp(16px,3vw,28px);flex-wrap:wrap}
   .dot{width:10px;height:10px;border-radius:50%;background:var(--acc);display:inline-block}
-  .grid{display:flex;flex-wrap:wrap;gap:24px 40px;align-items:center}
-  .txt{flex:999 1 560px;min-width:0}
-  h1{margin:0;font-weight:900;line-height:.92;color:var(--text-strong)}
-  .name{display:block;font-family:var(--f-disp);font-weight:800;font-size:clamp(1.15rem,2.4vw,1.75rem);letter-spacing:0;line-height:1.2;color:var(--text-strong);margin-bottom:18px}
-  .big{display:block;font-size:clamp(3rem,9vw,8rem);letter-spacing:-2px}
+  .grid{display:flex;flex-wrap:wrap;gap:28px 48px;align-items:center}
+  .txt{flex:999 1 600px;min-width:0}
+  h1{margin:0;font-weight:900;line-height:1;color:var(--text-strong)}
+  .big{display:block;font-size:clamp(1.6rem,4.5vw,4.3rem);letter-spacing:-1px}
   .punk{color:var(--punk)}
-  .alias{display:inline-block;font-size:.55em;font-weight:600;color:var(--acc);border:1px solid var(--acc);padding:4px 8px;margin-left:8px;vertical-align:middle;letter-spacing:.5px}
-  .visual{flex:1 1 320px;min-width:0;position:relative;max-width:440px;margin:0 auto;aspect-ratio:460/500}
+  .sub{margin-top:clamp(16px,2.4vw,28px);max-width:640px;font-size:clamp(1.02rem,1.5vw,1.22rem);line-height:1.55;color:var(--text-2)}
+  .sub strong{color:var(--text-strong);font-weight:600}
+  .alias{display:inline-block;font-size:12px;font-weight:600;color:var(--acc);border:1px solid var(--acc);padding:3px 8px;margin-left:4px;vertical-align:middle;letter-spacing:.5px;white-space:nowrap}
+  .ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:clamp(18px,2.4vw,32px)}
+  .visual{flex:1 1 300px;min-width:0;position:relative;max-width:420px;margin:0 auto;aspect-ratio:1}
   .deco{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-  .photo{position:absolute;left:50%;top:44%;width:58%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;overflow:hidden;border:3px solid var(--acc);box-shadow:0 0 0 8px rgba(7,16,13,.85),0 0 60px -6px var(--acc);background:var(--bg-3)}
+  .photo{position:absolute;left:50%;top:50%;width:76%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;overflow:hidden;border:3px solid var(--acc);box-shadow:0 0 0 8px rgba(7,16,13,.85),0 0 60px -6px var(--acc);background:var(--bg-3)}
   .photo :global(img){width:100%;height:100%;object-fit:cover;object-position:50% 18%}
-  .tag{position:absolute;right:2%;bottom:8%;margin:0;background:var(--punk);color:var(--bg);font-size:12px;font-weight:600;padding:8px 12px;transform:rotate(-3deg)}
-  .foot{margin-top:40px;display:flex;flex-wrap:wrap;gap:28px;align-items:center;justify-content:space-between}
-  .lead{max-width:640px;font-size:clamp(1.05rem,1.6vw,1.25rem);line-height:1.6;color:var(--text-2)}
-  .lead strong{color:var(--text-strong);font-weight:600}
-  .ctas{display:flex;flex-wrap:wrap;gap:14px}
+  .ground{position:absolute;left:0;right:0;bottom:0;width:100%;height:clamp(56px,8vw,110px);pointer-events:none;z-index:1}
   .spore{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--acc);box-shadow:0 0 12px var(--acc);opacity:.75;pointer-events:none;animation:float 9s ease-in-out infinite}
   .spore.pk{background:var(--punk);box-shadow:0 0 12px var(--punk)}
   .s1{left:6%;top:10%}.s2{left:44%;top:4%;animation-delay:2s}.s3{left:34%;top:92%;animation-delay:4s}.s4{left:94%;top:74%;animation-delay:1s}.s5{left:62%;top:18%;animation-delay:5s}
-  .hero{position:relative}
   @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-38px)}}
+  @media (max-width:600px){
+    .grid{flex-direction:column;align-items:stretch;gap:24px}
+    .txt{flex:none}
+    .visual{flex:none;width:220px;max-width:220px}
+    .status{font-size:11px;letter-spacing:1px}
+    .ctas .btn{padding:12px 18px}
+  }
 </style>
