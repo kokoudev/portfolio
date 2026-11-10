@@ -1,5 +1,6 @@
 ---
 import Img from '../ui/Img.astro';
+import YouTube from '../ui/YouTube.astro';
 import type { Project } from '../../lib/schema';
 import type { Repo } from '../../lib/github';
 
@@ -37,6 +38,11 @@ const fmt = (d: string) => (d ? new Date(d).toLocaleDateString('fr-FR', { month:
         <p class="mono stack">{p.stack}</p>
         {p.url ? <a href={p.url} class="mono more" {...(isExternal(p.url) ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>{p.cta || 'Voir →'}</a> : <span class="todo">[ LIEN À AJOUTER ]</span>}
       </div>
+      {p.videos.length > 0 && (
+        <div class="vids">
+          {p.videos.map((v) => <YouTube id={v.youtubeId} title={v.title} />)}
+        </div>
+      )}
     </article>
   ))}
 
@@ -48,6 +54,12 @@ const fmt = (d: string) => (d ? new Date(d).toLocaleDateString('fr-FR', { month:
           <div class="row"><span class="disp outline num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span><span class={badgeClass(p)}>{p.badge}</span></div>
           <h3 class="ctitle">{p.title}</h3>
           <p class="desc">{p.description}</p>
+          {p.gallery.length > 0 && (
+            <ul class="gal" aria-label={`Captures de ${p.title}`}>
+              {p.gallery.map((g) => <li class="zoom"><Img src={g.image} alt={g.alt} widths={[240, 480]} sizes="(max-width: 700px) 45vw, 160px" position="top" /></li>)}
+            </ul>
+          )}
+          {p.videos.map((v) => <YouTube id={v.youtubeId} title={v.title} />)}
           <p class="mono stack">{p.stack}</p>
           {p.url ? <a href={p.url} class="mono more" {...(isExternal(p.url) ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>{p.cta || 'Voir →'}{isExternal(p.url) && <span class="sr-only"> (nouvel onglet)</span>}</a> : <span class="todo">[ LIEN À AJOUTER ]</span>}
         </div>
@@ -120,6 +132,10 @@ const fmt = (d: string) => (d ? new Date(d).toLocaleDateString('fr-FR', { month:
   .lbl{font-size:12px}.lbl.pk{color:var(--punk-soft)}.lbl.ac{color:var(--acc)}
   .stack{font-size:12px;color:var(--muted)}
   .more{font-size:14px;font-weight:600;text-decoration:none;padding:10px 0;min-height:44px;display:inline-flex;align-items:center;align-self:flex-start}
+  .vids{flex:1 1 100%;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:12px;padding:0 clamp(24px,3vw,36px) clamp(24px,3vw,36px)}
+  .gal{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+  .gal li{aspect-ratio:4/3;background:var(--bg-3);border:1px solid var(--line-2)}
+  .gal :global(img){width:100%;height:100%;object-fit:cover}
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:20px}
   .card{display:flex;flex-direction:column;overflow:hidden}
   .thumb{aspect-ratio:16/9;background:var(--bg-3);border-bottom:1px solid var(--line-2)}

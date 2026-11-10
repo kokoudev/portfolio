@@ -14,7 +14,13 @@ const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || (import.meta.env.DE
       <a href="/" class="mono logo">kokou<span class="acc">dev</span>.admin</a>
       <h1 class="disp">Connexion</h1>
       <div class="f"><label for="u" class="mono">UTILISATEUR</label><input id="u" name="username" autocomplete="username" required maxlength="80" /></div>
-      <div class="f"><label for="p" class="mono">MOT DE PASSE</label><input id="p" name="password" type="password" autocomplete="current-password" required maxlength="256" /></div>
+      <div class="f">
+        <label for="p" class="mono">MOT DE PASSE</label>
+        <div class="pw">
+          <input id="p" name="password" type="password" autocomplete="current-password" required maxlength="256" spellcheck="false" autocapitalize="off" />
+          <button type="button" class="mono eye" data-toggle aria-controls="p" aria-pressed="false">Afficher</button>
+        </div>
+      </div>
       <div class="ts" data-sitekey={siteKey} data-turnstile></div>
       <button class="btn btn--acc mono" type="submit">Se connecter</button>
       <p class="mono err" role="alert" data-err></p>
@@ -27,6 +33,18 @@ const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || (import.meta.env.DE
   const holder = form.querySelector<HTMLElement>('[data-turnstile]')!;
   const err = form.querySelector<HTMLElement>('[data-err]')!;
   let wid: string | undefined;
+
+  // Afficher / masquer le mot de passe
+  const pwInput = form.querySelector<HTMLInputElement>('#p')!;
+  const toggle = form.querySelector<HTMLButtonElement>('[data-toggle]')!;
+  toggle.addEventListener('click', () => {
+    const show = pwInput.type === 'password';
+    pwInput.type = show ? 'text' : 'password';
+    toggle.textContent = show ? 'Masquer' : 'Afficher';
+    toggle.setAttribute('aria-pressed', String(show));
+    toggle.setAttribute('aria-label', show ? 'Masquer le mot de passe' : 'Afficher le mot de passe');
+    pwInput.focus();
+  });
   window.onTsLogin = () => { wid = window.turnstile?.render(holder, { sitekey: holder.dataset.sitekey, action: 'login', theme: 'dark', language: 'fr' }); };
   const s = document.createElement('script');
   s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTsLogin';
@@ -55,7 +73,10 @@ const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || (import.meta.env.DE
       err.textContent = 'Réseau indisponible.';
     } finally {
       btn.disabled = false;
-      (form.querySelector('#p') as HTMLInputElement).value = '';
+      pwInput.value = '';
+      pwInput.type = 'password'; // on remasque toujours après une tentative
+      toggle.textContent = 'Afficher';
+      toggle.setAttribute('aria-pressed', 'false');
       window.turnstile?.reset(wid);
     }
   });
@@ -73,5 +94,8 @@ const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || (import.meta.env.DE
   input:focus{outline:2px solid var(--acc);outline-offset:1px}
   .ts{min-height:65px}
   .err{color:var(--punk-soft);font-size:13px;min-height:1.4em}
-  .hint{font-size:11px;color:var(--muted)}
+  .pw{display:flex}
+  .pw input{flex:1;min-width:0;border-right:0}
+  .eye{background:var(--bg);border:1px solid var(--line-3);color:var(--acc);font-size:12px;padding:0 14px;min-width:92px;min-height:48px;cursor:pointer}
+  .eye:hover,.eye[aria-pressed='true']{background:var(--bg-3)}
 </style>
