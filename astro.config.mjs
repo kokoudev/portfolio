@@ -2,9 +2,10 @@
 import { defineConfig, envField } from 'astro/config';
 import react from '@astrojs/react';
 import netlify from '@astrojs/netlify';
+import { SITE_URL } from './site.config.mjs';
 
 export default defineConfig({
-  site: process.env.SITE_URL || 'https://kokoudev.netlify.app',
+  site: SITE_URL, // voir site.config.mjs
   output: 'server',
   adapter: netlify({ imageCDN: true }),
   integrations: [react()],

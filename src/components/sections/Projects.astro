@@ -26,7 +26,7 @@ const fmt = (d: string) => (d ? new Date(d).toLocaleDateString('fr-FR', { month:
   </div>
 
   {featured.map((p) => (
-    <article id={`projet-${p.id}`} class="tile case reveal" data-cat={p.category}>
+    <article id={`projet-${p.id}`} class="tile case" data-cat={p.category}>
       <div class="shots">
         {p.image && <div class="zoom main"><Img src={p.image} alt={p.imageAlt} widths={[480, 800, 1200]} sizes="(max-width: 900px) 100vw, 60vw" position="top-left" /></div>}
         {p.gallery.map((g) => <div class="zoom sub"><Img src={g.image} alt={g.alt} widths={[480, 800, 1200]} sizes="(max-width: 900px) 100vw, 60vw" /></div>)}
@@ -53,7 +53,7 @@ const fmt = (d: string) => (d ? new Date(d).toLocaleDateString('fr-FR', { month:
 
   <div class="cards">
     {others.map((p, i) => (
-      <article id={`projet-${p.id}`} class="tile card reveal" data-cat={p.category}>
+      <article id={`projet-${p.id}`} class="tile card" data-cat={p.category}>
         {p.image && <div class="zoom thumb"><Img src={p.image} alt={p.imageAlt} widths={[400, 800]} sizes="(max-width: 700px) 100vw, 45vw" position="top" /></div>}
         <div class="cbody">
           <div class="row"><span class="disp outline num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span><span class={badgeClass(p)}>{p.badge}</span></div>
@@ -75,7 +75,7 @@ const fmt = (d: string) => (d ? new Date(d).toLocaleDateString('fr-FR', { month:
   </div>
   <p class="mono empty" data-empty hidden>Aucun projet dans cette catégorie pour l’instant.</p>
 
-  <div class="gh reveal">
+  <div class="gh">
     <div class="ghhead">
       <p class="mono"><span class="acc">$</span> git log --author=kokoudev <span class="muted">→ dépôts publics GitHub, mis à jour automatiquement</span></p>
       <a href="https://github.com/kokoudev" class="btn mono" target="_blank" rel="noopener noreferrer">github.com/kokoudev ↗</a>

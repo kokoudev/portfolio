@@ -7,7 +7,7 @@ export const prerender = true;
 const bots = ['*', 'Googlebot', 'Bingbot', 'GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-SearchBot', 'Claude-User', 'PerplexityBot', 'Perplexity-User', 'Google-Extended', 'Applebot', 'Applebot-Extended', 'DuckDuckBot', 'YandexBot', 'meta-externalagent', 'CCBot'];
 
 export const GET: APIRoute = ({ site }) => {
-  const base = (site ?? new URL('https://kokoudev.netlify.app')).toString().replace(/\/$/, '');
+  const base = String(site ?? import.meta.env.SITE).replace(/\/$/, '');
   const rules = bots.map((b) => `User-agent: ${b}\nAllow: /\nAllow: /llms.txt\nDisallow: /admin\nDisallow: /api/\n`).join('\n');
   return new Response(`${rules}\nSitemap: ${base}/sitemap.xml\n`, {
     headers: { 'Content-Type': 'text/plain; charset=utf-8' },

@@ -88,6 +88,39 @@ Le projet Netlify **`kokoudev`** existe déjà : **https://kokoudev.netlify.app*
 
 Sans `TURNSTILE_SECRET_KEY` en production, le formulaire de contact et la connexion admin sont **refusés** (sécurité par défaut).
 
+## Brancher un nom de domaine personnel
+
+Toutes les adresses du site (canonical, Open Graph, `sitemap.xml`, `robots.txt`, `llms.txt`, JSON-LD) viennent d'**un seul réglage** : `SITE_URL`, lu par [`site.config.mjs`](site.config.mjs). Aucune autre adresse n'est écrite en dur.
+
+Exemple avec `kokoudev.com` (remplacez par votre domaine) :
+
+1. **Acheter le domaine** chez un registraire (Namecheap, OVH, Gandi, Porkbun…), ou directement dans Netlify (**Domains → Register a domain** ; les DNS sont alors configurés automatiquement, passez à l'étape 4).
+2. **Ajouter le domaine à Netlify** : [app.netlify.com/projects/kokoudev](https://app.netlify.com/projects/kokoudev) → **Domain management → Add a domain** → saisir `kokoudev.com` → *Verify* → *Add domain*. Netlify ajoute aussi `www.kokoudev.com`.
+3. **Configurer les DNS chez le registraire**, au choix :
+   - **Option A (recommandée)** : Netlify DNS. **Domain management → Options → Set up Netlify DNS**, puis remplacez chez le registraire les serveurs de noms par les 4 serveurs `dns1…dns4.p0X.nsone.net` affichés par Netlify.
+   - **Option B** : garder les DNS du registraire et créer :
+     | Type | Nom | Valeur |
+     |---|---|---|
+     | `A` | `@` | `75.2.60.5` (load balancer Netlify, à vérifier dans l'écran Netlify) |
+     | `CNAME` | `www` | `kokoudev.netlify.app` |
+   La propagation prend de quelques minutes à 48 h.
+4. **HTTPS** : **Domain management → HTTPS → Verify DNS configuration** puis *Provision certificate* (Let's Encrypt, gratuit). Attendez le cadenas vert.
+5. **Domaine principal** : dans **Domain management**, définissez `kokoudev.com` comme *Primary domain*. Netlify redirige alors automatiquement (301) `www.kokoudev.com` et `kokoudev.netlify.app` vers lui.
+6. **Changer l'adresse du site** : **Environment variables** → `SITE_URL` = `https://kokoudev.com` (sans `/` final), puis **Deploys → Trigger deploy → Clear cache and deploy site**.
+7. **Turnstile** : tableau de bord Cloudflare → Turnstile → votre widget → **Hostnames** → ajoutez `kokoudev.com` (et `www.kokoudev.com`). Sans cela, la connexion admin et le formulaire de contact seront refusés sur le nouveau domaine.
+8. **Vérifier** (remplacez le domaine) :
+   ```sh
+   curl -sI https://kokoudev.com/ | grep -i -E "strict-transport|content-security"
+   curl -s https://kokoudev.com/ | grep -o '<link rel="canonical"[^>]*>'
+   curl -s https://kokoudev.com/sitemap.xml | head -5
+   curl -s https://kokoudev.com/robots.txt
+   curl -sI https://kokoudev.netlify.app/ | grep -i location   # doit pointer vers kokoudev.com
+   ```
+9. **Référencement** : ajoutez la nouvelle propriété dans Google Search Console et Bing Webmaster Tools (vérification par DNS conseillée), soumettez `https://kokoudev.com/sitemap.xml`, puis utilisez l'outil **Changement d'adresse** de Search Console depuis l'ancienne propriété. Mettez à jour le lien du profil GitHub.
+10. **Après quelques semaines sans problème** : vous pouvez inscrire le domaine sur [hstspreload.org](https://hstspreload.org) (impossible sur un sous-domaine `netlify.app`).
+
+La session admin utilise un cookie `__Host-` lié au domaine : après le changement, reconnectez-vous sur la nouvelle adresse.
+
 ## Utiliser l'espace admin
 
 1. Ouvrez `https://<votre-site>/admin` → page de connexion (identifiant, mot de passe, vérification Turnstile).

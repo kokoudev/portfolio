@@ -7,8 +7,8 @@ const { items } = Astro.props;
   <h2 id="formation-title" class="h2"><span class="eyebrow" aria-hidden="true">03 / FORMATION</span>Mon <span class="outline">parcours</span></h2>
   <p class="intro">Du CEPD à la Licence, du plus ancien au plus récent.</p>
   <div class="tlw">
-    <svg class="stem v" viewBox="0 0 20 600" preserveAspectRatio="none" aria-hidden="true"><path class="vine" d="M10 0 C 2 80, 18 160, 10 240 S 2 400, 10 600" stroke="#B6FF5C" stroke-width="2" /></svg>
-    <svg class="stem h" viewBox="0 0 1200 20" preserveAspectRatio="none" aria-hidden="true"><path class="vine" d="M0 10 C 150 2, 300 18, 450 10 S 750 2, 900 10 S 1100 18, 1200 10" stroke="#B6FF5C" stroke-width="2" /></svg>
+    <svg class="stem v" viewBox="0 0 20 600" preserveAspectRatio="none" aria-hidden="true"><path class="vine still" d="M10 0 C 2 80, 18 160, 10 240 S 2 400, 10 600" stroke="#B6FF5C" stroke-width="2" /></svg>
+    <svg class="stem h" viewBox="0 0 1200 20" preserveAspectRatio="none" aria-hidden="true"><path class="vine still" d="M0 10 C 150 2, 300 18, 450 10 S 750 2, 900 10 S 1100 18, 1200 10" stroke="#B6FF5C" stroke-width="2" /></svg>
   <ol class="tl">
     {items.map((f) => (
       <li class:list={['tile step reveal', { cur: f.current }]}>
