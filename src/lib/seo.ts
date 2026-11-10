@@ -1,11 +1,12 @@
 import type { Content } from './schema';
+import { skillNames } from '../data/skills';
 
 /** Identité unique, réutilisée partout (balises, JSON-LD, llms.txt) pour des signaux cohérents. */
 export const identity = {
   name: 'SOEDJE Kokou Ariel Caesar',
   alias: 'kokoudev',
   alternateNames: ['kokoudev', 'Kokou Dev', 'Kokou Ariel Caesar SOEDJE', 'Ariel Caesar SOEDJE'],
-  jobTitle: 'Développeur web & full-stack junior',
+  jobTitle: 'Développeur web & mobile',
   city: 'Lomé',
   country: 'Togo',
   countryCode: 'TG',
@@ -14,7 +15,7 @@ export const identity = {
   phoneDisplay: '+228 97 84 88 80',
   github: 'https://github.com/kokoudev',
   school: 'IPNET Institute of Technology',
-  skills: ['Développement web', 'Full-stack', 'JavaScript', 'TypeScript', 'Python', 'React', 'Astro', 'AdonisJS', 'Flutter', 'IoT', 'ESP32', 'MQTT', 'Cybersécurité', 'Algorithmique'],
+  skills: ['Développement web', 'Développement mobile', ...skillNames, 'Cybersécurité', 'Algorithmique'],
 };
 
 /** Données structurées schema.org (graphe) : ProfilePage + Person + WebSite + projets + diplômes. */
@@ -89,8 +90,8 @@ export function buildJsonLd(site: URL, imageUrl: string, content?: Content) {
 
 export const faq: [string, string][] = [
   ['Qui est kokoudev ?', `kokoudev est le pseudonyme de ${identity.name}, ${identity.jobTitle.toLowerCase()} basé à Lomé (Togo), diplômé en Licence Génie Logiciel à IPNET (2023 – 2026).`],
-  ['Sur quoi travaille kokoudev ?', 'Des applications web full-stack et des projets connectés : VISION, un antivol pour motos qui localise la moto et coupe le moteur à distance (AdonisJS, Flutter, ESP32), AlgoVisualizer et des sites vitrines pour des clients.'],
-  ['Quelles technologies utilise-t-il ?', 'JavaScript / TypeScript, Python, React, Astro, AdonisJS, Flutter, MQTT et ESP32, avec une base en cybersécurité (Cisco, Fortinet) et en algorithmique (Stanford).'],
+  ['Sur quoi travaille kokoudev ?', 'Des sites et des applications web et mobiles : VISION, un antivol connecté pour motos (application Flutter, API AdonisJS, base MySQL et panneau d’administration ; boîtier ESP32 en prototypage), Givvly, AlgoVisualizer et des sites vitrines pour des clients.'],
+  ['Quelles technologies utilise-t-il ?', 'Interface : HTML/CSS et JavaScript. Backend : AdonisJS, Python et PHP/Symfony. Données : MySQL. Mobile : Flutter. Déploiement : Git, Railway et Netlify. Il a aussi une base en cybersécurité (Cisco, Fortinet) et en algorithmique (Stanford).'],
   ['Comment contacter kokoudev ?', `Par email à ${identity.email}, par téléphone au ${identity.phoneDisplay}, ou via GitHub (github.com/kokoudev).`],
   ['Est-il disponible ?', 'Oui : pour un emploi, un stage ou une mission, à Lomé ou à distance (fuseau GMT+0).'],
 ];

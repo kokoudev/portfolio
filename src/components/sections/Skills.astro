@@ -1,0 +1,52 @@
+---
+import { skillLayers } from '../../data/skills';
+import type { Project } from '../../lib/schema';
+interface Props { projects: Project[] }
+const { projects } = Astro.props;
+// Nom court de chaque projet (avant le « — »), seulement pour les projets qui existent encore.
+const names = new Map(projects.map((p) => [p.id, p.title.split('—')[0].trim()]));
+---
+<section id="competences" class="wrap section" aria-labelledby="skills-title">
+  <h2 id="skills-title" class="h2"><span class="eyebrow" aria-hidden="true">02 / COMPÉTENCES</span>Par couche, <span class="outline">prouvé</span></h2>
+  <p class="intro">Chaque compétence renvoie au projet qui la démontre.</p>
+  <ul class="grid">
+    {skillLayers.map((l) => (
+      <li class="tile layer">
+        <h3 class="mono lt">{l.layer.toUpperCase()}</h3>
+        <ul class="skills">
+          {l.skills.map((s) => {
+            const proofs = s.proofs.filter((id) => names.has(id));
+            return (
+              <li>
+                <span class="sn">{s.name}</span>
+                {s.note && <span class="mono note">{s.note}</span>}
+                {proofs.length > 0 && (
+                  <span class="proofs">
+                    <span class="sr-only">prouvé par :</span>
+                    {proofs.map((id) => <a href={`#projet-${id}`} class="mono pf">→ {names.get(id)}</a>)}
+                  </span>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+        {l.extra && <a href={l.extra.href} class="mono pf ext" target="_blank" rel="noopener noreferrer">{l.extra.label}<span class="sr-only"> (nouvel onglet)</span></a>}
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .intro{margin-top:16px;color:var(--text-3);font-size:16px}
+  .grid{list-style:none;margin:32px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:16px}
+  .layer{padding:20px;display:flex;flex-direction:column;gap:12px}
+  .lt{font-size:13px;letter-spacing:2px;color:var(--acc)}
+  .skills{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+  .skills li{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
+  .sn{font-weight:600;color:var(--text-strong);font-size:16px}
+  .note{font-size:11px;color:var(--punk-soft)}
+  .proofs{flex-basis:100%;display:flex;flex-wrap:wrap;gap:2px 14px}
+  .pf{font-size:13px;text-decoration:none;min-height:32px;display:inline-flex;align-items:center}
+  .pf:hover{text-decoration:underline}
+  .ext{margin-top:auto;color:var(--text-3)}
+</style>

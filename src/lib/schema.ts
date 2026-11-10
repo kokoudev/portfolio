@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { LAYERS } from './layers';
 
 /** Texte court nettoyé : pas de caractères de contrôle. */
 const text = (max: number) =>
@@ -44,6 +45,13 @@ const galleryItem = z.object({ image: imageRef.refine((v) => v !== '', { message
 /** Vidéo YouTube rattachée à un projet. */
 const videoItem = z.object({ youtubeId, title: text(160) });
 
+/** Couche réellement construite (ou prévue) dans un projet. La couche vient d'une liste fermée. */
+const builtItem = z.object({
+  layer: z.enum(LAYERS),
+  detail: text(160).pipe(z.string().min(1, 'Détail manquant')),
+  planned: z.boolean().default(false),
+});
+
 export const projectSchema = z.object({
   id,
   title: text(120).pipe(z.string().min(1)),
@@ -60,6 +68,8 @@ export const projectSchema = z.object({
   featured: z.boolean().default(false),
   problem: text(300).default(''),
   solution: text(400).default(''),
+  built: z.array(builtItem).max(12).default([]),
+  status: text(200).default(''),
 });
 
 export const formationSchema = z.object({
@@ -105,6 +115,8 @@ export const contentSchema = z.object({
   certifications: z.array(certificationSchema).max(60),
   diplomas: z.array(diplomaSchema).max(20),
   video: videoSchema,
+  /** Migrations de contenu déjà appliquées (voir src/lib/migrations.ts). */
+  migrations: z.array(z.string().regex(/^[a-z0-9-]{1,64}$/)).max(50).default([]),
 });
 
 export type Project = z.infer<typeof projectSchema>;

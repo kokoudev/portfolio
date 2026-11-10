@@ -1,0 +1,33 @@
+---
+import { LAYER_LABEL } from '../../lib/layers';
+import type { Project } from '../../lib/schema';
+interface Props { items: Project['built']; title: string }
+const { items, title } = Astro.props;
+---
+{items.length > 0 && (
+  <div class="built">
+    <p class="mono bt">CE QUE J’AI CONSTRUIT</p>
+    <ul aria-label={`Ce que j’ai construit : ${title}`}>
+      {items.map((b) => (
+        <li class:list={[{ planned: b.planned }]}>
+          <span class="mono layer">{LAYER_LABEL[b.layer]}</span>
+          <span class="detail">{b.detail}</span>
+          {b.planned && <span class="mono tag">prévu</span>}
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
+
+<style>
+  .built{border:1px solid var(--line-2);background:var(--bg);padding:14px 16px}
+  .bt{font-size:12px;letter-spacing:2px;color:var(--acc);margin-bottom:10px}
+  ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+  li{display:grid;grid-template-columns:10px 1fr auto;column-gap:10px;align-items:start;font-size:15px;line-height:1.4;color:var(--text-strong)}
+  li::before{content:"";grid-row:1 / span 2;width:8px;height:8px;margin-top:5px;background:var(--acc)}
+  .layer{grid-column:2;font-size:11px;letter-spacing:.5px;color:var(--text-3)}
+  .detail{grid-column:2;min-width:0}
+  .tag{grid-column:3;grid-row:1 / span 2;align-self:center;font-size:11px;color:var(--punk-soft);border:1px solid var(--punk);padding:1px 6px}
+  .planned{color:var(--text-3)}
+  .planned::before{background:transparent;border:1.5px dashed var(--punk)}
+</style>

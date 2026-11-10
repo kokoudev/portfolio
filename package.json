@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "version": "1.0.0",
-  "description": "Portfolio de SOEDJE Kokou Ariel Caesar — Astro + React, Cloudflare Workers, D1, R2.",
+  "description": "Portfolio de SOEDJE Kokou Ariel Caesar (kokoudev) — Astro + React, hébergé sur Netlify.",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",

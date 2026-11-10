@@ -11,6 +11,7 @@ import Defense from '../components/sections/Defense.astro';
 import Diplomas from '../components/sections/Diplomas.astro';
 import Contact from '../components/sections/Contact.astro';
 import Faq from '../components/sections/Faq.astro';
+import Skills from '../components/sections/Skills.astro';
 import { readContent } from '../lib/store';
 import { getRepos } from '../lib/github';
 
@@ -31,8 +32,9 @@ Astro.response.headers.set('Netlify-Vary', 'query=none'); // ?x=1, ?x=2… ne co
   <main id="main">
     <Hero />
     <Marquee text="BUILD ✦ GROW ✦ SHIP ✦ LOMÉ ✦ WEB ✦ MOBILE ✦ IOT ✦ IA ✦ " />
-    <Facts />
+    <Facts projects={content.projects} />
     <Projects projects={content.projects} repos={repos} />
+    <Skills projects={content.projects} />
     <Marquee text="SOLARPUNK DEV ✦ MADE IN LOMÉ ✦ " variant="outline" />
     <Formation items={content.formations} />
     <Certifications items={content.certifications} />

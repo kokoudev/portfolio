@@ -1,6 +1,7 @@
 import { getStore } from '@netlify/blobs';
 import { contentSchema, type Content } from './schema';
 import { seed } from '../data/seed';
+import { migrate } from './migrations';
 
 const CONTENT_KEY = 'site-v1';
 
@@ -35,7 +36,7 @@ export async function readContent(): Promise<Content> {
     const raw = await contentStore().get(CONTENT_KEY, { type: 'json' });
     if (!raw) return structuredClone(seed);
     const parsed = contentSchema.safeParse(raw);
-    return parsed.success ? parsed.data : structuredClone(seed);
+    return parsed.success ? migrate(parsed.data, seed) : structuredClone(seed);
   } catch (err) {
     console.error('[store] lecture impossible, contenu initial utilisé', err instanceof Error ? err.message : err);
     return structuredClone(seed);

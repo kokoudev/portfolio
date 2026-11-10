@@ -1,6 +1,6 @@
 # Portfolio — SOEDJE Kokou Ariel Caesar
 
-Portfolio personnel de **SOEDJE Kokou Ariel Caesar**, développeur web & full-stack junior à Lomé (Togo), Licence en Génie Logiciel (IPNET).
+Portfolio personnel de **SOEDJE Kokou Ariel Caesar**, développeur web & mobile à Lomé (Togo), Licence en Génie Logiciel (IPNET).
 
 Esthétique « solarpunk + punk » : fond quadrillé `#07100D`, vert néon `#B6FF5C`, rose `#FF4FB8`, polices Unbounded / Space Grotesk / JetBrains Mono (auto-hébergées), lianes SVG qui poussent, feuilles qui éclosent, spores lumineuses, orbite autour de la photo. Toutes les animations respectent `prefers-reduced-motion`.
 

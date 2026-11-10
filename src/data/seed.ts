@@ -1,5 +1,6 @@
 import { contentSchema, type Content } from '../lib/schema';
 import type { z } from 'zod';
+import { MIGRATION_IDS } from '../lib/migrations';
 
 /**
  * Contenu initial du site. Il sert tant que rien n'a été enregistré depuis l'admin.
@@ -13,35 +14,74 @@ const rawSeed: z.input<typeof contentSchema> = {
       badge: 'EN COURS · PROJET DE FIN D’ÉTUDES',
       category: 'iot',
       description:
-        'Antivol connecté pour motos : un boîtier embarqué localise la moto en temps réel et permet de couper le moteur à distance depuis l’application.',
+        'Antivol connecté pour motos : une application mobile et un panneau d’administration reliés à une API ; un boîtier embarqué, en prototypage, doit localiser la moto et permettre de couper le moteur à distance.',
       problem: 'À Lomé, une moto volée disparaît en quelques minutes.',
       solution:
-        'Un boîtier ESP32-S3 avec modem 4G envoie sa position par MQTT ; l’app affiche la carte, les trajets, la zone de sécurité (géofencing) et commande l’arrêt moteur, refusé si la moto roule.',
-      stack: 'AdonisJS · Flutter · ESP32-S3 · MQTT (EMQX) · Redis · MySQL · PASETO',
+        'Une application Flutter et un panneau d’administration web s’appuient sur une API AdonisJS et une base MySQL. Un boîtier ESP32 communiquant par MQTT est prévu pour envoyer la position de la moto et recevoir l’ordre d’arrêt du moteur.',
+      stack: 'Flutter · AdonisJS · MySQL · panneau admin web — prévu : Redis · MQTT · ESP32',
       url: '#soutenance',
       cta: 'Voir la soutenance →',
       image: 'asset:vision-admin',
-      imageAlt: 'Tableau de bord d’administration de VISION (données de démonstration)',
+      imageAlt: 'Tableau de bord d’administration de VISION (écran recréé, données de démonstration)',
       gallery: [
-        { image: 'asset:vision-tracking', alt: 'Module de localisation de VISION : carte, trajet et arrêt moteur (données de démonstration)' },
+        { image: 'asset:vision-tracking', alt: 'Module de localisation de VISION (écran recréé, données de démonstration)' },
       ],
       featured: true,
+      built: [
+        { layer: 'mobile', detail: 'Application Flutter' },
+        { layer: 'api', detail: 'API AdonisJS' },
+        { layer: 'db', detail: 'Base de données MySQL' },
+        { layer: 'interface', detail: 'Panneau d’administration web séparé' },
+        { layer: 'db', detail: 'Cache Redis', planned: true },
+        { layer: 'api', detail: 'Communication MQTT avec le boîtier', planned: true },
+        { layer: 'embedded', detail: 'Boîtier ESP32 (en prototypage)', planned: true },
+      ],
+      status: 'Application et panneau admin en test · module matériel en prototypage',
     },
     {
-      id: 'algovisualizer',
-      title: 'AlgoVisualizer',
-      badge: 'EN LIGNE',
+      id: 'givvly',
+      title: 'Givvly',
+      badge: 'CODE SOURCE',
       category: 'web',
-      description: 'Visualisation pas à pas de QuickSort, Two Sum et Karatsuba, avec analyse de complexité.',
+      description:
+        'Plateforme de financement participatif (dons) : une API AdonisJS avec sa base MySQL, et un panneau d’administration React séparé.',
       problem: '',
       solution: '',
-      stack: 'Python · JavaScript · Railway',
-      url: 'https://web-production-2e739.up.railway.app',
-      cta: 'Voir le site ↗',
+      stack: 'AdonisJS · MySQL · React',
+      url: 'https://github.com/kokoudev/givvly-platform',
+      cta: 'Voir le code ↗',
       image: '',
       imageAlt: '',
       gallery: [],
       featured: false,
+      built: [
+        { layer: 'api', detail: 'API AdonisJS' },
+        { layer: 'db', detail: 'Base de données MySQL' },
+        { layer: 'interface', detail: 'Panneau d’administration React séparé' },
+      ],
+      status: '',
+    },
+    {
+      id: 'algovisualizer',
+      title: 'AlgoVisualizer',
+      badge: 'CODE SOURCE',
+      category: 'web',
+      description: 'Visualisation pas à pas de QuickSort, Two Sum et Karatsuba, avec analyse de complexité.',
+      problem: '',
+      solution: '',
+      stack: 'Python (Flask) · JavaScript · Railway',
+      url: 'https://github.com/kokoudev/algorithmetest-',
+      cta: 'Voir le code ↗',
+      image: '',
+      imageAlt: '',
+      gallery: [],
+      featured: false,
+      built: [
+        { layer: 'interface', detail: 'Interface JavaScript (animations pas à pas)' },
+        { layer: 'api', detail: 'Backend Python (Flask)' },
+        { layer: 'deploy', detail: 'Déploiement Railway (hors ligne pour l’instant)' },
+      ],
+      status: '',
     },
     {
       id: 'gamedi',
@@ -59,6 +99,35 @@ const rawSeed: z.input<typeof contentSchema> = {
       imageAlt: 'Page d’accueil du site vitrine : « Votre voiture importée, prix tout compris »',
       gallery: [],
       featured: false,
+      built: [
+        { layer: 'interface', detail: 'Site vitrine responsive, optimisé pour le référencement (SEO)' },
+        { layer: 'deploy', detail: 'Déploiement Netlify' },
+      ],
+      status: '',
+    },
+    {
+      id: 'it232',
+      title: 'Gestion des soutenances (IT232)',
+      badge: 'PROJET DE COURS',
+      category: 'web',
+      description:
+        'Application web de planification des soutenances : étudiants, enseignants, salles, jurys, détection des conflits d’horaires et espace enseignant.',
+      problem: '',
+      solution: '',
+      stack: 'Symfony 6.4 · PHP 8.3 · Doctrine · Twig · Bootstrap',
+      url: 'https://github.com/kokoudev/SOEDJE_KOKOU_ARIEL_CAESAR_IT232_code',
+      cta: 'Voir le code ↗',
+      image: '',
+      imageAlt: '',
+      gallery: [],
+      featured: false,
+      built: [
+        { layer: 'interface', detail: 'Pages Twig + Bootstrap' },
+        { layer: 'api', detail: 'Application Symfony 6.4 (PHP 8.3)' },
+        { layer: 'db', detail: 'Base SQLite via Doctrine ORM' },
+        { layer: 'auth', detail: 'Connexion par rôles (Symfony Security, mots de passe hachés)' },
+      ],
+      status: '',
     },
   ],
   formations: [
@@ -148,6 +217,7 @@ const rawSeed: z.input<typeof contentSchema> = {
     title: 'Soutenance — VISION, Digital Guardian',
     caption: 'Présentation du projet de fin d’études devant le jury d’IPNET.',
   },
+  migrations: [...MIGRATION_IDS],
 };
 
 /** Contenu initial validé (les valeurs par défaut du schéma sont appliquées). */
