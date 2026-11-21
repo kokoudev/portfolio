@@ -3,6 +3,7 @@ import Img from '../ui/Img.astro';
 import YouTube from '../ui/YouTube.astro';
 import Built from '../ui/Built.astro';
 import VisionArchitecture from './VisionArchitecture.astro';
+import VisionPrototype from './VisionPrototype.astro';
 import type { Project } from '../../lib/schema';
 import type { Repo } from '../../lib/github';
 
@@ -42,6 +43,7 @@ const fmt = (d: string) => (d ? new Date(d).toLocaleDateString('fr-FR', { month:
         <p class="mono stack">{p.stack}</p>
         {p.url ? <a href={p.url} class="mono more" {...(isExternal(p.url) ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>{p.cta || 'Voir →'}</a> : <span class="todo">[ LIEN À AJOUTER ]</span>}
       </div>
+      {p.id === 'vision' && <VisionPrototype />}
       {p.id === 'vision' && <VisionArchitecture />}
       {p.videos.length > 0 && (
         <div class="vids">

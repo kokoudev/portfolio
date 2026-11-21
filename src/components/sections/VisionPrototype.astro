@@ -1,0 +1,110 @@
+---
+/**
+ * Prototype réel du boîtier VISION : photo d'origine (mémoire de soutenance) avec des repères
+ * cliquables sur chaque composant. Sans JS, la légende numérotée reste entièrement lisible.
+ * Aucun style en ligne (CSP) : la position de chaque repère est une classe.
+ */
+import { Picture } from 'astro:assets';
+import photo from '../../assets/projects/vision-prototype.jpg';
+
+const parts = [
+  { id: 'esp32', name: 'ESP32', role: 'le cerveau : lit le GPS, parle au serveur, pilote le relais' },
+  { id: 'relais', name: 'Relais', role: 'coupe le circuit d’allumage quand l’ordre est validé' },
+  { id: 'gps', name: 'Module GPS', role: 'donne la position de la moto' },
+  { id: 'gsm', name: 'SIM800L', role: 'module GSM pour envoyer les données sans WiFi' },
+  { id: 'alim', name: 'Convertisseur LM2596', role: 'abaisse le 12 V de la batterie de la moto' },
+];
+---
+<section class="proto" aria-labelledby="proto-title" data-proto>
+  <div class="head">
+    <p class="mono kicker"><span class="dot" aria-hidden="true"></span>PHOTO RÉELLE · PROTOTYPE EN ESSAIS</p>
+    <h4 id="proto-title" class="disp ttl">Le boîtier, <span class="outline">en vrai</span></h4>
+    <p class="lead">Assemblé et soudé à la main. Touchez un repère pour découvrir chaque composant.</p>
+  </div>
+
+  <div class="grid">
+    <div class="photo">
+      <Picture src={photo} alt="Prototype du boîtier VISION : carte ESP32, relais, module GPS, module SIM800L et convertisseur de tension soudés sur une plaque" formats={['avif', 'webp']} widths={[320, 480, 585]} sizes="(max-width: 700px) 86vw, 380px" loading="lazy" />
+      {parts.map((p, i) => (
+        <button type="button" class={`pin p-${p.id}`} data-part={p.id} aria-describedby={`part-${p.id}`} aria-label={`${i + 1}. ${p.name}`}>
+          <span aria-hidden="true">{i + 1}</span>
+        </button>
+      ))}
+    </div>
+
+    <div class="side">
+      <ol class="parts">
+        {parts.map((p, i) => (
+          <li id={`part-${p.id}`} data-part={p.id}>
+            <span class="mono n" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            <span><strong>{p.name}</strong> — {p.role}</span>
+          </li>
+        ))}
+      </ol>
+      <div class="fw">
+        <p class="mono fwt">FIRMWARE · VERSION 4</p>
+        <ul>
+          <li>Reçoit les ordres par <strong>MQTT</strong> (WiFi, ou réseau mobile via le SIM800L).</li>
+          <li>N’exécute que des commandes <strong>signées</strong> (PASETO, vérification Ed25519).</li>
+          <li>Refuse de couper le moteur si la moto roule : <strong>la vitesse est vérifiée par le boîtier lui-même</strong>.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Survol, focus ou clic sur un repère ou une ligne de légende : les deux s'allument ensemble.
+  document.querySelectorAll<HTMLElement>('[data-proto]').forEach((root) => {
+    const all = root.querySelectorAll<HTMLElement>('[data-part]');
+    let locked = '';
+    const show = (id: string) => all.forEach((el) => el.classList.toggle('on', el.dataset.part === id));
+    root.addEventListener('pointerover', (e) => {
+      const t = (e.target as HTMLElement).closest<HTMLElement>('[data-part]');
+      if (t) show(t.dataset.part!);
+    });
+    root.addEventListener('pointerleave', () => show(locked));
+    root.addEventListener('focusin', (e) => {
+      const t = (e.target as HTMLElement).closest<HTMLElement>('[data-part]');
+      if (t) show(t.dataset.part!);
+    });
+    root.addEventListener('click', (e) => {
+      const t = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-part]');
+      if (!t) return;
+      locked = locked === t.dataset.part ? '' : t.dataset.part!;
+      show(locked);
+    });
+  });
+</script>
+
+<style>
+  .proto{flex:1 1 100%;margin:0 clamp(24px,3vw,36px) clamp(24px,3vw,36px);border:1px solid var(--line-2);background:linear-gradient(135deg,rgba(182,255,92,.05),transparent 45%),var(--bg);padding:clamp(18px,3vw,32px)}
+  .kicker{display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:2px;color:var(--acc)}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--punk);box-shadow:0 0 10px var(--punk)}
+  .ttl{margin-top:10px;font-size:clamp(1.5rem,3vw,2.2rem);font-weight:900;line-height:1.05;color:var(--text-strong)}
+  .lead{margin-top:8px;color:var(--text-3);font-size:15px}
+  .grid{margin-top:22px;display:flex;flex-wrap:wrap;gap:24px 36px;align-items:flex-start}
+  .photo{position:relative;flex:0 1 380px;max-width:380px;margin:0 auto;border:2px solid var(--acc);box-shadow:8px 8px 0 var(--punk);background:var(--bg-3);line-height:0}
+  .photo :global(img){width:100%;height:auto;display:block}
+  .side{flex:1 1 300px;min-width:0;display:flex;flex-direction:column;gap:20px}
+  .pin{position:absolute;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;border:2px solid var(--bg);background:var(--acc);color:var(--bg);font:700 14px/1 var(--f-mono);cursor:pointer;display:grid;place-items:center;box-shadow:0 0 0 3px rgba(182,255,92,.35);transition:transform .2s ease,background .2s ease,box-shadow .2s ease}
+  .pin:hover,.pin:focus-visible,.pin.on{transform:scale(1.18);background:var(--punk);box-shadow:0 0 0 6px rgba(255,79,184,.3)}
+  /* positions mesurées sur la photo d'origine (585 × 1039) */
+  .p-relais{left:26%;top:9%}
+  .p-esp32{left:31%;top:30%}
+  .p-gps{left:73%;top:15%}
+  .p-gsm{left:73%;top:33%}
+  .p-alim{left:56%;top:50%}
+  .parts{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+  .parts li{display:flex;gap:12px;align-items:baseline;padding:10px 12px;border:1px solid transparent;font-size:15px;line-height:1.45;color:var(--text-2);transition:border-color .2s ease,background .2s ease}
+  .parts li.on{border-color:var(--punk);background:rgba(255,79,184,.07)}
+  .parts strong{color:var(--text-strong);font-weight:600}
+  .n{font-size:12px;color:var(--acc)}
+  .parts li.on .n{color:var(--punk-soft)}
+  .fw{border-top:1px dashed var(--line-3);padding-top:16px}
+  .fwt{font-size:12px;letter-spacing:2px;color:var(--acc);margin-bottom:10px}
+  .fw ul{margin:0;padding-left:18px;display:grid;gap:8px;color:var(--text-2);font-size:15px;line-height:1.5}
+  .fw strong{color:var(--text-strong);font-weight:600}
+  @media (max-width:600px){.proto{margin:0 12px 20px;padding:16px}.parts li{padding:8px 10px}}
+  @media (prefers-reduced-motion:reduce){.pin:hover,.pin:focus-visible,.pin.on{transform:none}}
+</style>
