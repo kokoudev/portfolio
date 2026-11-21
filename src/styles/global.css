@@ -110,3 +110,6 @@ body::after{content:"";position:fixed;inset:0;z-index:3;pointer-events:none;opac
   .glitch .g{display:none}
   .tile:hover,.tile:focus-within{transform:none}
 }
+
+/* Cibles de focus programmatique (ex. retour en haut) : pas de cadre autour de toute la section */
+[tabindex="-1"]:focus{outline:none}

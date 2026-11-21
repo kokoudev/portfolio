@@ -1,0 +1,33 @@
+---
+/**
+ * Flèche « retour en haut », visible en permanence sur toute la page.
+ * Lien simple vers #top (fonctionne sans JS) ; avec JS : défilement doux et focus rendu au haut de page.
+ */
+---
+<a href="#top" class="totop" data-totop aria-label="Revenir en haut de la page">
+  <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square" /></svg>
+</a>
+
+<script>
+  const btn = document.querySelector<HTMLAnchorElement>('[data-totop]');
+  const top = document.getElementById('top');
+  if (btn && top) {
+    btn.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      history.replaceState(null, '', location.pathname + location.search);
+      // Le focus revient au début de la page (clavier et lecteurs d'écran)
+      top.setAttribute('tabindex', '-1');
+      top.focus({ preventScroll: true });
+    });
+  }
+</script>
+
+<style>
+  .totop{position:fixed;right:clamp(14px,3vw,28px);bottom:clamp(14px,3vw,28px);z-index:50;width:52px;height:52px;display:grid;place-items:center;background:var(--acc);color:var(--bg);border:2px solid var(--bg);box-shadow:5px 5px 0 var(--punk);text-decoration:none;transition:transform .25s ease,opacity .25s ease,box-shadow .2s ease}
+  .totop:hover{color:var(--bg);transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--punk)}
+  .totop:focus-visible{outline:3px solid var(--punk);outline-offset:3px}
+  @media (prefers-reduced-motion:reduce){.totop{transition:none}}
+  @media print{.totop{display:none}}
+</style>

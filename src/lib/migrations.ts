@@ -6,7 +6,7 @@ import type { Content, Project } from './schema';
  * enregistré AVANT un changement, sans écraser ce que le propriétaire a modifié depuis l'admin :
  * un champ n'est remplacé que s'il contient encore l'ancienne valeur d'origine.
  */
-export const MIGRATION_IDS = ['preuves-2026-11'] as const;
+export const MIGRATION_IDS = ['preuves-2026-11', 'fortinet-lien-2026-11'] as const;
 
 /** Anciennes valeurs d'origine (avant la migration « preuves-2026-11 »). */
 const OLD: Record<string, Partial<Record<keyof Project, string>>> = {
@@ -56,8 +56,15 @@ function preuves(c: Content, seed: Content): Content {
   return { ...c, projects };
 }
 
+/** Le lien Fortinet d'origine menait à une page d'administration générique, pas à une vérification. */
+const FORTINET_GENERIC = 'https://training.fortinet.com/admin/tool/certificate/index.php';
+function fortinetLien(c: Content): Content {
+  return { ...c, certifications: c.certifications.map((x) => (x.verifyUrl === FORTINET_GENERIC ? { ...x, verifyUrl: '' } : x)) };
+}
+
 const STEPS: Record<(typeof MIGRATION_IDS)[number], (c: Content, seed: Content) => Content> = {
   'preuves-2026-11': preuves,
+  'fortinet-lien-2026-11': fortinetLien,
 };
 
 /** Applique les migrations manquantes (idempotent). */

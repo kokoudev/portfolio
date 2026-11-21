@@ -1,8 +1,6 @@
 ---
 import '../styles/global.css';
-import { getImage } from 'astro:assets';
 import { PUBLIC_GOOGLE_SITE_VERIFICATION, PUBLIC_BING_SITE_VERIFICATION } from 'astro:env/client';
-import ogSource from '../assets/og/og-image.png';
 import { buildJsonLd, faqJsonLd } from '../lib/seo';
 import type { Content } from '../lib/schema';
 
@@ -15,16 +13,18 @@ interface Props {
 }
 const {
   title = 'kokoudev — SOEDJE Kokou Ariel Caesar, développeur web & mobile à Lomé',
-  description = 'kokoudev, c’est SOEDJE Kokou Ariel Caesar : développeur web & mobile à Lomé (Togo). Du site vitrine à l’application connectée : projets, certifications Stanford et Cisco, Licence IPNET.',
+  description = 'kokoudev — SOEDJE Kokou Ariel Caesar, développeur web & mobile à Lomé (Togo) : sites web, applis Flutter, API AdonisJS. Projets et contact.',
   noindex = false,
   content,
   withFaq = false,
 } = Astro.props;
 const site = Astro.site ?? new URL(Astro.url.origin);
 const canonical = new URL(Astro.url.pathname, site).toString();
-const og = await getImage({ src: ogSource, format: 'png', width: 1200, height: 630 });
-const ogUrl = new URL(og.src, site).toString();
-const jsonLd = buildJsonLd(site, ogUrl, content);
+// Adresses stables (fichiers de public/) : elles ne changent pas d'un déploiement à l'autre,
+// donc les caches des réseaux sociaux et des moteurs ne cassent pas.
+const ogUrl = new URL('/og.png', site).toString();
+const portraitUrl = new URL('/portrait.jpg', site).toString();
+const jsonLd = buildJsonLd(site, portraitUrl, content);
 ---
 <!doctype html>
 <html lang="fr">
@@ -44,6 +44,9 @@ const jsonLd = buildJsonLd(site, ogUrl, content);
     <meta name="geo.region" content="TG-M" />
     <meta name="geo.placename" content="Lomé" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <link rel="me" href="https://github.com/kokoudev" />
     <link rel="alternate" type="text/plain" href="/llms.txt" title="Résumé pour les IA (llms.txt)" />
     <link rel="sitemap" href="/sitemap.xml" />

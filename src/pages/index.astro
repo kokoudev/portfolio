@@ -12,6 +12,7 @@ import Diplomas from '../components/sections/Diplomas.astro';
 import Contact from '../components/sections/Contact.astro';
 import Faq from '../components/sections/Faq.astro';
 import Skills from '../components/sections/Skills.astro';
+import BackToTop from '../components/ui/BackToTop.astro';
 import { readContent } from '../lib/store';
 import { getRepos } from '../lib/github';
 
@@ -41,6 +42,7 @@ Astro.response.headers.set('Netlify-Vary', 'query=none'); // ?x=1, ?x=2… ne co
     <Faq />
     <Contact />
   </main>
+  <BackToTop />
 </Base>
 
 

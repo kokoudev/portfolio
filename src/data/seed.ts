@@ -187,7 +187,7 @@ const rawSeed: z.input<typeof contentSchema> = {
       date: 'Janv. 2024 · expiré en janv. 2026',
       description: 'Fondamentaux de la cybersécurité et du paysage des menaces.',
       image: 'asset:fortinet-fca',
-      verifyUrl: 'https://training.fortinet.com/admin/tool/certificate/index.php',
+      verifyUrl: '',
     },
     {
       id: 'greatlearning-linux',

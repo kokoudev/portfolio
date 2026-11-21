@@ -1,0 +1,26 @@
+---
+import Base from '../layouts/Base.astro';
+
+export const prerender = true;
+---
+<Base title="Page introuvable — kokoudev" description="Cette page n’existe pas. Retour au portfolio de kokoudev, développeur web & mobile à Lomé." noindex>
+  <main class="nf wrap" id="top">
+    <p class="mono code">ERREUR 404</p>
+    <h1 class="disp ttl">Cette page n’a pas <span class="outline">poussé</span><span class="pk">.</span></h1>
+    <p class="d">L’adresse est peut-être mal tapée, ou la page a été déplacée.</p>
+    <div class="ctas">
+      <a href="/" class="btn btn--acc mono">Retour à l’accueil →</a>
+      <a href="/#projets" class="btn mono">Voir les projets</a>
+      <a href="/#contact" class="btn mono">Me contacter</a>
+    </div>
+  </main>
+</Base>
+
+<style>
+  .nf{min-height:100vh;display:flex;flex-direction:column;justify-content:center;gap:20px;padding-top:48px;padding-bottom:48px}
+  .code{font-size:13px;letter-spacing:3px;color:var(--acc)}
+  .ttl{font-size:clamp(2rem,6vw,4.4rem);font-weight:900;line-height:1.02;color:var(--text-strong);max-width:16ch}
+  .pk{color:var(--punk)}
+  .d{color:var(--text-3);font-size:17px;max-width:520px}
+  .ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+</style>

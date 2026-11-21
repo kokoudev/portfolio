@@ -56,5 +56,7 @@ export default defineConfig({
   },
   vite: {
     build: { assetsInlineLimit: 0 },
+    // Date de mise en ligne, identique dans le JSON-LD (dateModified) et le sitemap (lastmod)
+    define: { __BUILD_DATE__: JSON.stringify(new Date().toISOString().slice(0, 10)) },
   },
 });
