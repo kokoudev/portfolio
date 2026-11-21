@@ -47,8 +47,7 @@ export const skillLayers: SkillLayer[] = [
   },
   {
     layer: 'IA',
-    skills: [{ name: 'Assistants et agents de code', proofs: [], note: 'ce portfolio : commits co-écrits avec un agent' }],
-    extra: { label: 'dépôt du portfolio ↗', href: 'https://github.com/kokoudev/portfolio/commits/main' },
+    skills: [{ name: 'Assistants et agents de code', proofs: [], note: 'au quotidien' }],
   },
 ];
 

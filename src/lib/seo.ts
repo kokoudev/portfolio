@@ -54,7 +54,7 @@ export function buildJsonLd(site: URL, portraitUrl: string, content?: Content) {
       url: `${base}/`,
       image: portraitUrl,
       mainEntityOfPage: { '@id': `${base}/#profile` },
-      knowsLanguage: ['fr'],
+      knowsLanguage: ['fr', 'en', 'ee'],
       hasOccupation: {
         '@type': 'Occupation',
         name: identity.jobTitle,

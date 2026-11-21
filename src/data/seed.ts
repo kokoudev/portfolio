@@ -185,9 +185,9 @@ const rawSeed: z.input<typeof contentSchema> = {
       title: 'Fortinet Certified Associate in Cybersecurity',
       issuer: 'Fortinet Training Institute',
       date: 'Janv. 2024 · expiré en janv. 2026',
-      description: 'Fondamentaux de la cybersécurité et du paysage des menaces.',
+      description: 'Fondamentaux de la cybersécurité et du paysage des menaces. N° de validation : 6038634386KA.',
       image: 'asset:fortinet-fca',
-      verifyUrl: '',
+      verifyUrl: 'https://training.fortinet.com/admin/tool/certificate/index.php',
     },
     {
       id: 'greatlearning-linux',

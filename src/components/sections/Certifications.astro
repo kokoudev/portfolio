@@ -1,15 +1,30 @@
 ---
+import { getImage } from 'astro:assets';
 import Img from '../ui/Img.astro';
+import { resolveImage } from '../../lib/images';
 import type { Certification } from '../../lib/schema';
 interface Props { items: Certification[] }
 const { items } = Astro.props;
+
+/** Adresse du certificat en grand (nouvel onglet) : image optimisée pleine taille, ou fichier envoyé depuis l'admin. */
+async function fullUrl(ref: string): Promise<string> {
+  const r = resolveImage(ref);
+  if (!r) return '';
+  if (r.kind === 'media') return r.src;
+  return (await getImage({ src: r.meta, format: 'webp', width: r.meta.width, quality: 90 })).src;
+}
+const full = await Promise.all(items.map((c) => fullUrl(c.image)));
 ---
 <section id="certifications" class="wrap section" aria-labelledby="certifs-title">
   <h2 id="certifs-title" class="h2"><span class="eyebrow" aria-hidden="true">04 / CERTIFICATIONS</span>Certifié, <span class="outline">vérifiable</span></h2>
   <ul class="grid">
-    {items.map((c) => (
+    {items.map((c, i) => (
       <li class="tile cert reveal">
-        <div class="zoom img">{c.image ? <Img src={c.image} alt={`Certificat ${c.issuer} : ${c.title}`} widths={[320, 640]} sizes="(max-width: 640px) 100vw, 320px" position="top" /> : <span class="todo">[ IMAGE À AJOUTER ]</span>}</div>
+        {full[i] ? (
+          <a href={full[i]} class="zoom img" target="_blank" rel="noopener"><Img src={c.image} alt={`Certificat ${c.issuer} : ${c.title} — voir en grand (nouvel onglet)`} widths={[320, 640]} sizes="(max-width: 640px) 100vw, 320px" position="top" /></a>
+        ) : (
+          <div class="zoom img"><span class="todo">[ IMAGE À AJOUTER ]</span></div>
+        )}
         <div class="b">
           <p class="mono meta">{c.issuer.toUpperCase()} · {c.date.toUpperCase()}</p>
           <h3 class="t">{c.title}</h3>
@@ -19,11 +34,10 @@ const { items } = Astro.props;
               {c.gallery.map((g) => <li class="zoom"><Img src={g.image} alt={g.alt || `Certificat ${c.title}`} widths={[200, 400]} sizes="120px" position="top" /></li>)}
             </ul>
           )}
-          {c.verifyUrl ? (
-            <a href={c.verifyUrl} class="mono v" target="_blank" rel="noopener noreferrer">Vérifier ↗<span class="sr-only"> le certificat {c.title} (nouvel onglet)</span></a>
-          ) : (
-            <span class="todo v">[ LIEN À AJOUTER ]</span>
-          )}
+          <p class="links">
+            {full[i] && <a href={full[i]} class="mono v" target="_blank" rel="noopener">Voir le certificat ↗<span class="sr-only"> {c.title} (nouvel onglet)</span></a>}
+            {c.verifyUrl && <a href={c.verifyUrl} class="mono v" target="_blank" rel="noopener noreferrer">Vérifier ↗<span class="sr-only"> le certificat {c.title} (nouvel onglet)</span></a>}
+          </p>
         </div>
       </li>
     ))}
@@ -42,5 +56,6 @@ const { items } = Astro.props;
   .meta{font-size:11px;color:var(--acc);letter-spacing:.3px}
   .t{font-size:1.05rem;font-weight:600;color:var(--text-strong);line-height:1.35}
   .d{font-size:14px;color:var(--text-3);line-height:1.5}
-  .v{margin-top:auto;font-size:13px;font-weight:600;text-decoration:none;padding:10px 0;min-height:44px;display:inline-flex;align-items:center}
+  .links{margin-top:auto;display:flex;flex-wrap:wrap;gap:0 18px}
+  .v{font-size:13px;font-weight:600;text-decoration:none;padding:10px 0;min-height:44px;display:inline-flex;align-items:center}
 </style>
