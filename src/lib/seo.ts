@@ -16,7 +16,7 @@ export const identity = {
   phone: '+22897848880',
   phoneDisplay: '+228 97 84 88 80',
   github: 'https://github.com/kokoudev',
-  linkedin: 'https://www.linkedin.com/in/ariel-soedje-884158298/',
+  linkedin: 'https://www.linkedin.com/in/kokoudev/',
   school: 'IPNET Institute of Technology',
   skills: ['Développement web', 'Développement mobile', ...skillNames, 'Cybersécurité', 'Algorithmique'],
 };
