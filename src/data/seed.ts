@@ -11,7 +11,7 @@ const rawSeed: z.input<typeof contentSchema> = {
     {
       id: 'vision',
       title: 'VISION — Digital Guardian',
-      badge: 'EN COURS · PROJET DE FIN D’ÉTUDES',
+      badge: 'PROJET DE FIN D’ÉTUDES · SOUTENU',
       category: 'iot',
       description:
         'Antivol connecté pour motos : une application mobile et un panneau d’administration reliés à une API ; un boîtier embarqué, en prototypage, doit localiser la moto et permettre de couper le moteur à distance.',
@@ -60,6 +60,33 @@ const rawSeed: z.input<typeof contentSchema> = {
         { layer: 'interface', detail: 'Panneau d’administration React séparé' },
       ],
       status: '',
+    },
+    {
+      id: 'togo-soins',
+      title: 'L’accès aux soins au Togo — Data Challenge',
+      badge: 'CONCOURS · RÉSULTATS LE 27 NOV.',
+      category: 'autre',
+      description:
+        'Tableau de bord interactif réalisé en équipe pour le Data Challenge du Togo AI Lab : quelles populations sont les plus éloignées d’un centre de santé, et où agir en priorité ? 396 cantons analysés, avec des données issues à 100 % de opendata.gouv.tg et geodata.gouv.tg.',
+      problem: '1 026 437 habitants, soit 12,7 % de la population, vivent à plus de 5 km à vol d’oiseau d’une USP, d’un CMS ou d’un hôpital.',
+      solution:
+        'Une carte des priorités par canton et par préfecture, un simulateur d’implantation de 1 à 50 nouveaux centres (10 centres bien placés font passer 128 436 habitants sous les 5 km) et une liste de centres de santé à équiper en solaire en priorité.',
+      stack: 'Python · pandas · GeoPandas · Plotly Dash',
+      url: '',
+      cta: 'Voir le tableau de bord ↗',
+      image: 'asset:togo-soins-carte',
+      imageAlt: 'Carte de l’indice de priorité d’accès aux soins par canton, avec le classement des cantons les plus prioritaires',
+      gallery: [
+        { image: 'asset:togo-soins-simulateur', alt: 'Simulateur d’implantation : effet de 10 nouveaux centres de santé sur la carte et par préfecture' },
+      ],
+      featured: false,
+      built: [
+        { layer: 'db', detail: 'Collecte et nettoyage des données ouvertes (API opendata et geodata)' },
+        { layer: 'api', detail: 'Analyse : distances, indice de priorité, typologie des cantons' },
+        { layer: 'interface', detail: 'Tableau de bord Plotly Dash : cartes, filtres, export CSV' },
+        { layer: 'deploy', detail: 'Mise en ligne du tableau de bord', planned: true },
+      ],
+      status: 'Tableau de bord en cours de déploiement · résultats du concours le 27 novembre 2026',
     },
     {
       id: 'algovisualizer',
@@ -139,8 +166,8 @@ const rawSeed: z.input<typeof contentSchema> = {
       year: '2023 – 2026',
       title: 'Licence en Génie Logiciel',
       school: 'IPNET Institute of Technology, Lomé',
-      detail: 'Soutenance à venir',
-      current: true,
+      detail: 'Soutenue le 21 novembre 2026',
+      current: false,
     },
   ],
   certifications: [
@@ -209,13 +236,13 @@ const rawSeed: z.input<typeof contentSchema> = {
     },
   ],
   diplomas: [
-    { id: 'licence', title: 'Licence en Génie Logiciel — IPNET', status: 'À AJOUTER après la soutenance', file: '', link: '' },
+    { id: 'licence', title: 'Licence en Génie Logiciel — IPNET', status: 'Soutenue le 21 nov. 2026 · diplôme À AJOUTER', file: '', link: '' },
     { id: 'certificats', title: 'Certificats Stanford, Cisco, Fortinet, Great Learning', status: '7 certificats', file: '', link: '#certifications' },
   ],
   video: {
     youtubeId: '',
     title: 'Soutenance — VISION, Digital Guardian',
-    caption: 'Présentation du projet de fin d’études devant le jury d’IPNET.',
+    caption: 'Projet de fin d’études présenté devant le jury d’IPNET le 21 novembre 2026.',
   },
   migrations: [...MIGRATION_IDS],
 };

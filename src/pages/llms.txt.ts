@@ -16,7 +16,7 @@ export const GET: APIRoute = async ({ site }) => {
   const lines = [
     `# kokoudev — ${identity.name}`,
     '',
-    `> kokoudev est le pseudonyme de ${identity.name}, ${identity.jobTitle.toLowerCase()} basé à ${identity.city} (${identity.country}). Licence en Génie Logiciel à IPNET (2023 – 2026). Disponible pour un emploi, un stage ou une mission, sur site ou à distance.`,
+    `> kokoudev est le pseudonyme de ${identity.name}, ${identity.jobTitle.toLowerCase()} basé à ${identity.city} (${identity.country}). Licence en Génie Logiciel à IPNET (2023 – 2026), soutenue le 21 novembre 2026. Disponible pour un emploi, un stage ou une mission, sur site ou à distance.`,
     '',
     `- Site : ${base}/`,
     `- GitHub : ${identity.github}`,

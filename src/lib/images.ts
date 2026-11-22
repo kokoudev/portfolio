@@ -3,6 +3,8 @@ import portrait from '../assets/photo/portrait.jpg';
 import visionAdmin from '../assets/projects/vision-dashboard.png';
 import visionTracking from '../assets/projects/vision-tracking.jpg';
 import gamedi from '../assets/projects/gamedi.jpg';
+import togoSoinsCarte from '../assets/projects/togo-soins-carte.jpg';
+import togoSoinsSimulateur from '../assets/projects/togo-soins-simulateur.jpg';
 import stanfordDC from '../assets/certs/stanford-divide-conquer.jpg';
 import stanfordGS from '../assets/certs/stanford-graph-search.jpg';
 import stanfordGD from '../assets/certs/stanford-greedy-dp.jpg';
@@ -17,6 +19,8 @@ export const assets: Record<string, ImageMetadata> = {
   'vision-admin': visionAdmin,
   'vision-tracking': visionTracking,
   gamedi,
+  'togo-soins-carte': togoSoinsCarte,
+  'togo-soins-simulateur': togoSoinsSimulateur,
   'stanford-divide-conquer': stanfordDC,
   'stanford-graph-search': stanfordGS,
   'stanford-greedy-dp': stanfordGD,

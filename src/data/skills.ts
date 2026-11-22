@@ -11,19 +11,23 @@ export const skillLayers: SkillLayer[] = [
     skills: [
       { name: 'HTML / CSS', proofs: ['gamedi', 'it232'] },
       { name: 'JavaScript', proofs: ['algovisualizer'] },
+      { name: 'Plotly Dash', proofs: ['togo-soins'] },
     ],
   },
   {
     layer: 'Backend',
     skills: [
       { name: 'AdonisJS', proofs: ['vision', 'givvly'] },
-      { name: 'Python', proofs: ['algovisualizer'] },
+      { name: 'Python', proofs: ['algovisualizer', 'togo-soins'] },
       { name: 'PHP / Symfony', proofs: ['it232'] },
     ],
   },
   {
     layer: 'Données',
-    skills: [{ name: 'MySQL', proofs: ['vision', 'givvly'] }],
+    skills: [
+      { name: 'MySQL', proofs: ['vision', 'givvly'] },
+      { name: 'Analyse de données (pandas, GeoPandas)', proofs: ['togo-soins'] },
+    ],
   },
   {
     layer: 'Mobile',

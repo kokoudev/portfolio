@@ -6,7 +6,7 @@ import type { Content, Project } from './schema';
  * enregistré AVANT un changement, sans écraser ce que le propriétaire a modifié depuis l'admin :
  * un champ n'est remplacé que s'il contient encore l'ancienne valeur d'origine.
  */
-export const MIGRATION_IDS = ['preuves-2026-11', 'fortinet-lien-2026-11', 'fortinet-retour-2026-11'] as const;
+export const MIGRATION_IDS = ['preuves-2026-11', 'fortinet-lien-2026-11', 'fortinet-retour-2026-11', 'soutenance-2026-11'] as const;
 
 /** Anciennes valeurs d'origine (avant la migration « preuves-2026-11 »). */
 const OLD: Record<string, Partial<Record<keyof Project, string>>> = {
@@ -78,10 +78,35 @@ function fortinetRetour(c: Content): Content {
   };
 }
 
+/** Soutenance passée (21 nov. 2026) et projet du Data Challenge ajouté après Givvly. Ne remplace que les valeurs d'origine. */
+function soutenance(c: Content, seed: Content): Content {
+  const swap = (v: string, old: string, neu: string) => (v === old ? neu : v);
+  const projects = c.projects.map((p) =>
+    p.id === 'vision' ? { ...p, badge: swap(p.badge, 'EN COURS · PROJET DE FIN D’ÉTUDES', 'PROJET DE FIN D’ÉTUDES · SOUTENU') } : p,
+  );
+  const tdc = seed.projects.find((p) => p.id === 'togo-soins');
+  if (tdc && !projects.some((p) => p.id === tdc.id)) {
+    const i = projects.findIndex((p) => p.id === 'givvly');
+    projects.splice(i >= 0 ? i + 1 : projects.length, 0, tdc);
+  }
+  const formations = c.formations.map((f) =>
+    f.id === 'licence' && f.detail === 'Soutenance à venir' ? { ...f, detail: 'Soutenue le 21 novembre 2026', current: false } : f,
+  );
+  const diplomas = c.diplomas.map((d) =>
+    d.id === 'licence' ? { ...d, status: swap(d.status, 'À AJOUTER après la soutenance', 'Soutenue le 21 nov. 2026 · diplôme À AJOUTER') } : d,
+  );
+  const video = {
+    ...c.video,
+    caption: swap(c.video.caption, 'Présentation du projet de fin d’études devant le jury d’IPNET.', 'Projet de fin d’études présenté devant le jury d’IPNET le 21 novembre 2026.'),
+  };
+  return { ...c, projects, formations, diplomas, video };
+}
+
 const STEPS: Record<(typeof MIGRATION_IDS)[number], (c: Content, seed: Content) => Content> = {
   'preuves-2026-11': preuves,
   'fortinet-lien-2026-11': fortinetLien,
   'fortinet-retour-2026-11': fortinetRetour,
+  'soutenance-2026-11': soutenance,
 };
 
 /** Applique les migrations manquantes (idempotent). */

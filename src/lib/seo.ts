@@ -101,7 +101,7 @@ export function buildJsonLd(site: URL, portraitUrl: string, content?: Content) {
 }
 
 export const faq: [string, string][] = [
-  ['Qui est kokoudev ?', `kokoudev est le pseudonyme de ${identity.name}, ${identity.jobTitle.toLowerCase()} basé à Lomé (Togo), en dernière année de Licence Génie Logiciel à IPNET (2023 – 2026, soutenance à venir).`],
+  ['Qui est kokoudev ?', `kokoudev est le pseudonyme de ${identity.name}, ${identity.jobTitle.toLowerCase()} basé à Lomé (Togo), qui a soutenu sa Licence en Génie Logiciel à IPNET (2023 – 2026) le 21 novembre 2026.`],
   ['Sur quoi travaille kokoudev ?', 'Des sites et des applications web et mobiles : VISION, un antivol connecté pour motos (application Flutter, API AdonisJS, base MySQL et panneau d’administration ; boîtier ESP32 en prototypage), Givvly, AlgoVisualizer et des sites vitrines pour des clients.'],
   ['Quelles technologies utilise-t-il ?', 'Interface : HTML/CSS et JavaScript. Backend : AdonisJS, Python et PHP/Symfony. Données : MySQL. Mobile : Flutter. Déploiement : Git, Railway et Netlify. Il a aussi une base en cybersécurité (Cisco, Fortinet) et en algorithmique (Stanford).'],
   ['Comment contacter kokoudev ?', `Par email à ${identity.email}, par téléphone au ${identity.phoneDisplay}, ou via GitHub (github.com/kokoudev).`],
