@@ -18,6 +18,7 @@ export const GET: APIRoute = async ({ site }) => {
     '',
     `> kokoudev est le pseudonyme de ${identity.name}, ${identity.jobTitle.toLowerCase()} basé à ${identity.city} (${identity.country}). Licence Professionnelle en Génie Logiciel à IPNET (2023 – 2026), soutenue le 21 novembre 2026. Langues : français (courant), éwé (langue maternelle), anglais (compréhension). Disponible immédiatement pour un emploi, un stage ou une mission, sur site ou à distance.`,
     '',
+    `- Autres noms : ${identity.alternateNames.filter((n) => n !== 'Kokou Dev').join(', ')}`,
     `- Site : ${base}/`,
     `- GitHub : ${identity.github}`,
     `- LinkedIn : ${identity.linkedin}`,
