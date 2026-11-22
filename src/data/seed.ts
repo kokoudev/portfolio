@@ -19,8 +19,8 @@ const rawSeed: z.input<typeof contentSchema> = {
       solution:
         'Une application Flutter et un panneau d’administration web s’appuient sur une API AdonisJS et une base MySQL. Un boîtier ESP32 communiquant par MQTT est prévu pour envoyer la position de la moto et recevoir l’ordre d’arrêt du moteur.',
       stack: 'Flutter · AdonisJS · MySQL · panneau admin web — prévu : Redis · MQTT · ESP32',
-      url: '#soutenance',
-      cta: 'Voir la soutenance →',
+      url: '#prototype-vision',
+      cta: 'Voir le boîtier en vrai ↓',
       image: 'asset:vision-admin',
       imageAlt: 'Tableau de bord d’administration de VISION (écran recréé, données de démonstration)',
       gallery: [
@@ -34,7 +34,7 @@ const rawSeed: z.input<typeof contentSchema> = {
         { layer: 'interface', detail: 'Panneau d’administration web séparé' },
         { layer: 'db', detail: 'Cache Redis', planned: true },
         { layer: 'api', detail: 'Communication MQTT avec le boîtier', planned: true },
-        { layer: 'embedded', detail: 'Boîtier ESP32 (en prototypage)', planned: true },
+        { layer: 'embedded', detail: 'Boîtier ESP32', planned: true },
       ],
       status: 'Application et panneau admin en test · module matériel en prototypage',
     },
@@ -64,7 +64,7 @@ const rawSeed: z.input<typeof contentSchema> = {
     {
       id: 'togo-soins',
       title: 'L’accès aux soins au Togo — Data Challenge',
-      badge: 'CONCOURS · RÉSULTATS LE 27 NOV.',
+      badge: 'CONCOURS · RÉSULTATS LE 27/11',
       category: 'autre',
       description:
         'Tableau de bord interactif réalisé en équipe pour le Data Challenge du Togo AI Lab : quelles populations sont les plus éloignées d’un centre de santé, et où agir en priorité ? 396 cantons analysés, avec des données issues à 100 % de opendata.gouv.tg et geodata.gouv.tg.',

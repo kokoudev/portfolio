@@ -10,12 +10,12 @@ import photo from '../../assets/projects/vision-prototype.jpg';
 const parts = [
   { id: 'esp32', name: 'ESP32', role: 'le cerveau : lit le GPS, parle au serveur, pilote le relais' },
   { id: 'relais', name: 'Relais', role: 'coupe le circuit d’allumage quand l’ordre est validé' },
-  { id: 'gps', name: 'Module GPS', role: 'donne la position de la moto' },
+  { id: 'gps', name: 'GPS NEO-M8N', role: 'donne la position de la moto' },
   { id: 'gsm', name: 'SIM800L', role: 'module GSM pour envoyer les données sans WiFi' },
   { id: 'alim', name: 'Convertisseur LM2596', role: 'abaisse le 12 V de la batterie de la moto' },
 ];
 ---
-<section class="proto" aria-labelledby="proto-title" data-proto>
+<section id="prototype-vision" class="proto" aria-labelledby="proto-title" data-proto>
   <div class="head">
     <p class="mono kicker"><span class="dot" aria-hidden="true"></span>PHOTO RÉELLE · PROTOTYPE EN ESSAIS</p>
     <h4 id="proto-title" class="disp ttl">Le boîtier, <span class="outline">en vrai</span></h4>
@@ -44,8 +44,8 @@ const parts = [
       <div class="fw">
         <p class="mono fwt">FIRMWARE · VERSION 4</p>
         <ul>
-          <li>Reçoit les ordres par <strong>MQTT</strong> (WiFi, ou réseau mobile via le SIM800L).</li>
-          <li>N’exécute que des commandes <strong>signées</strong> (PASETO, vérification Ed25519).</li>
+          <li>Reçoit les ordres par <strong>MQTT</strong> (WiFi, ou réseau mobile via le SIM800L) : en essais, pas encore relié à l’application.</li>
+          <li>N’exécute que des commandes <strong>authentifiées</strong>.</li>
           <li>Refuse de couper le moteur si la moto roule : <strong>la vitesse est vérifiée par le boîtier lui-même</strong>.</li>
         </ul>
       </div>

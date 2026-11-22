@@ -11,6 +11,7 @@ export const skillLayers: SkillLayer[] = [
     skills: [
       { name: 'HTML / CSS', proofs: ['gamedi', 'it232'] },
       { name: 'JavaScript', proofs: ['algovisualizer'] },
+      { name: 'React', proofs: ['givvly'] },
       { name: 'Plotly Dash', proofs: ['togo-soins'] },
     ],
   },
@@ -37,14 +38,14 @@ export const skillLayers: SkillLayer[] = [
     layer: 'Embarqué',
     skills: [
       { name: 'ESP32', proofs: ['vision'], note: 'en prototypage' },
-      { name: 'MQTT', proofs: ['vision'], note: 'prévu' },
+      { name: 'MQTT', proofs: ['vision'], note: 'en prototypage' },
     ],
   },
   {
     layer: 'Déploiement',
     skills: [
       { name: 'Git', proofs: [], note: 'tous les dépôts' },
-      { name: 'Railway', proofs: ['algovisualizer'] },
+      { name: 'Railway', proofs: ['algovisualizer'], note: 'déploiement passé' },
       { name: 'Netlify', proofs: ['gamedi'] },
       { name: 'Vercel', proofs: ['togo-soins'] },
     ],

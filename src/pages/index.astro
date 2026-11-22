@@ -7,7 +7,6 @@ import Facts from '../components/sections/Facts.astro';
 import Projects from '../components/sections/Projects.astro';
 import Formation from '../components/sections/Formation.astro';
 import Certifications from '../components/sections/Certifications.astro';
-import Defense from '../components/sections/Defense.astro';
 import Diplomas from '../components/sections/Diplomas.astro';
 import Contact from '../components/sections/Contact.astro';
 import Faq from '../components/sections/Faq.astro';
@@ -37,7 +36,6 @@ Astro.response.headers.set('Netlify-Vary', 'query=none'); // ?x=1, ?x=2… ne co
     <Skills projects={content.projects} />
     <Formation items={content.formations} />
     <Certifications items={content.certifications} />
-    <Defense video={content.video} />
     <Diplomas items={content.diplomas} />
     <Faq />
     <Contact />

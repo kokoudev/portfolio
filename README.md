@@ -30,7 +30,7 @@ Esthétique « solarpunk + punk » : fond quadrillé `#07100D`, vert néon `#B6F
 ├─ src/
 │  ├─ assets/                photo, certificats, captures (optimisés en AVIF/WebP au build)
 │  ├─ data/seed.ts           contenu initial (utilisé tant que l'admin n'a rien enregistré)
-│  ├─ components/sections/   Accueil, Projets, Formation, Certifications, Soutenance, Diplômes, Contact
+│  ├─ components/sections/   Accueil, Projets, Formation, Certifications, Diplômes, FAQ, Contact
 │  ├─ admin/                 application React de l'admin (onglets, glisser-déposer, envoi de fichiers)
 │  ├─ lib/                   auth (PASETO, scrypt), sécurité, stockage Blobs, schémas zod, GitHub
 │  ├─ middleware.ts          protection de /admin et /api/admin, CSRF, en-têtes
@@ -124,16 +124,15 @@ La session admin utilise un cookie `__Host-` lié au domaine : après le changem
 ## Utiliser l'espace admin
 
 1. Ouvrez `https://<votre-site>/admin` → page de connexion (identifiant, mot de passe, vérification Turnstile).
-2. Onglets : **Projets · Formations · Certifications · Diplômes · Vidéo de soutenance · Messages**.
+2. Onglets : **Projets · Formations · Certifications · Diplômes · Messages**.
 3. Dans chaque onglet :
    - **+ Ajouter** ouvre le formulaire ; **Modifier** / **Supprimer** sur chaque ligne.
    - **Réordonner** : glissez la poignée `⋮⋮`, ou au clavier : Tab jusqu'à la poignée, **Espace**, flèches, **Espace**.
    - **Fichiers** : images PNG, JPEG, WebP, AVIF ou PDF, 5 Mo max (limite des fonctions Netlify). Le type est vérifié sur le contenu réel du fichier.
      ⚠️ Avant d'envoyer une capture, vérifiez qu'**aucun numéro de téléphone** n'y apparaît.
 4. Chaque action est enregistrée immédiatement et le cache du site est purgé : la page publique se met à jour en quelques secondes.
-5. **Vidéo de soutenance** : collez le lien YouTube (vidéo « non répertoriée »). Sur le site, la vidéo n'est chargée qu'au clic (youtube-nocookie).
-6. **Messages** : les messages du formulaire de contact arrivent ici.
-7. **Se déconnecter** révoque la session côté serveur. Une session expire de toute façon après 2 h.
+5. **Messages** : les messages du formulaire de contact arrivent ici.
+6. **Se déconnecter** révoque la session côté serveur. Une session expire de toute façon après 2 h.
 
 **Changer de mot de passe** : relancez `node scripts/setup-admin.mjs`, remplacez les variables sur Netlify, redéployez : toutes les sessions ouvertes sont alors invalidées (le jeton contient une empreinte du mot de passe en vigueur). Changer `PASETO_LOCAL_KEY` a le même effet.
 
@@ -160,7 +159,7 @@ Les IP ne sont jamais stockées en clair (empreinte SHA-256).
 - Images en **AVIF / WebP** avec `srcset`, chargement différé sauf la photo de l'accueil (prioritaire).
 - Animations en **CSS / SVG uniquement** (pas de bibliothèque d'animation) ; moins de 3 Ko de JavaScript sur la page publique.
 - Polices auto-hébergées en woff2, sous-ensemble latin, préchargées.
-- Turnstile n'est chargé qu'à l'approche du formulaire ; la vidéo YouTube seulement au clic.
+- Turnstile n'est chargé qu'à l'approche du formulaire .
 
 ## Référencement : SEO et GEO (« kokoudev »)
 
@@ -185,7 +184,6 @@ Netlify facture désormais à **crédits** : le plan gratuit donne **300 crédit
 
 Marqués « À AJOUTER » sur le site, modifiables depuis l'admin :
 
-- Vidéo YouTube de la soutenance.
 - Diplôme de Licence (après la soutenance).
 - Liens de vérification Cisco et Great Learning.
 - Captures de VISION : ce sont des **écrans recréés à partir du code** avec des données de démonstration (sources dans `tools/screens/`).

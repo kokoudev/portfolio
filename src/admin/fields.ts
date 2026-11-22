@@ -11,12 +11,11 @@ export interface Field {
   accept?: string;
 }
 
-export const tabs: { key: CollectionName | 'video' | 'messages'; label: string }[] = [
+export const tabs: { key: CollectionName | 'messages'; label: string }[] = [
   { key: 'projects', label: 'Projets' },
   { key: 'formations', label: 'Formations' },
   { key: 'certifications', label: 'Certifications' },
   { key: 'diplomas', label: 'Diplômes' },
-  { key: 'video', label: 'Vidéo de soutenance' },
   { key: 'messages', label: 'Messages' },
 ];
 

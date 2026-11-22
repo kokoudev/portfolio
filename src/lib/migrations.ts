@@ -6,7 +6,7 @@ import type { Content, Project } from './schema';
  * enregistré AVANT un changement, sans écraser ce que le propriétaire a modifié depuis l'admin :
  * un champ n'est remplacé que s'il contient encore l'ancienne valeur d'origine.
  */
-export const MIGRATION_IDS = ['preuves-2026-11', 'fortinet-lien-2026-11', 'fortinet-retour-2026-11', 'soutenance-2026-11', 'data-challenge-liens-2026-11'] as const;
+export const MIGRATION_IDS = ['preuves-2026-11', 'fortinet-lien-2026-11', 'fortinet-retour-2026-11', 'soutenance-2026-11', 'data-challenge-liens-2026-11', 'sans-video-2026-11', 'coherence-2026-11'] as const;
 
 /** Anciennes valeurs d'origine (avant la migration « preuves-2026-11 »). */
 const OLD: Record<string, Partial<Record<keyof Project, string>>> = {
@@ -120,12 +120,38 @@ function dataChallengeLiens(c: Content): Content {
   };
 }
 
+/** La section vidéo de soutenance est retirée : le lien de VISION mène au boîtier réel. */
+function sansVideo(c: Content): Content {
+  return {
+    ...c,
+    projects: c.projects.map((p) =>
+      p.id === 'vision' && p.url === '#soutenance'
+        ? { ...p, url: '#prototype-vision', cta: p.cta === 'Voir la soutenance →' ? 'Voir le boîtier en vrai ↓' : p.cta }
+        : p,
+    ),
+  };
+}
+
+/** Audit de cohérence : libellé du boîtier sans doublon « (en prototypage) (prévu) », badge du concours. */
+function coherence(c: Content): Content {
+  return {
+    ...c,
+    projects: c.projects.map((p) => ({
+      ...p,
+      badge: p.id === 'togo-soins' && p.badge === 'CONCOURS · RÉSULTATS LE 27 NOV.' ? 'CONCOURS · RÉSULTATS LE 27/11' : p.badge,
+      built: p.built.map((b) => (b.detail === 'Boîtier ESP32 (en prototypage)' ? { ...b, detail: 'Boîtier ESP32' } : b)),
+    })),
+  };
+}
+
 const STEPS: Record<(typeof MIGRATION_IDS)[number], (c: Content, seed: Content) => Content> = {
   'preuves-2026-11': preuves,
   'fortinet-lien-2026-11': fortinetLien,
   'fortinet-retour-2026-11': fortinetRetour,
   'soutenance-2026-11': soutenance,
   'data-challenge-liens-2026-11': dataChallengeLiens,
+  'sans-video-2026-11': sansVideo,
+  'coherence-2026-11': coherence,
 };
 
 /** Applique les migrations manquantes (idempotent). */

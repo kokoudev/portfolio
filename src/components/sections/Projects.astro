@@ -11,7 +11,7 @@ interface Props { projects: Project[]; repos: Repo[] }
 const { projects, repos } = Astro.props;
 const featured = projects.filter((p) => p.featured);
 const others = projects.filter((p) => !p.featured);
-const filters = [['tous', 'Tous'], ['web', 'Web'], ['client', 'Clients'], ['iot', 'IoT']];
+const filters = [['tous', 'Tous'], ['web', 'Web'], ['client', 'Clients'], ['iot', 'IoT'], ['autre', 'Données']];
 const isExternal = (u: string) => u.startsWith('https://');
 const badgeClass = (p: Project) => (p.category === 'client' ? 'badge badge--line' : p.featured ? 'badge badge--punk' : 'badge badge--acc');
 const fmt = (d: string) => (d ? new Date(d).toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' }) : '');

@@ -126,7 +126,7 @@ function Panel({ user }: { user: string }) {
 
         {!content && !status && <p className="mono">Chargement…</p>}
 
-        {content && tab !== 'video' && tab !== 'messages' && (
+        {content && tab !== 'messages' && (
           <CollectionEditor
             key={tab}
             name={tab}
@@ -138,7 +138,6 @@ function Panel({ user }: { user: string }) {
           />
         )}
 
-        {content && tab === 'video' && <VideoEditor content={content} onSave={(v) => save({ ...content, video: v })} />}
 
         {tab === 'messages' && (
           <MessagesView
@@ -469,28 +468,6 @@ function BuiltField({ id, items, onChange }: { id: string; items: BuiltItem[]; o
   );
 }
 
-function VideoEditor({ content, onSave }: { content: Content; onSave: (v: Content['video']) => void }) {
-  const [v, setV] = useState(content.video);
-  const [link, setLink] = useState(v.youtubeId ? `https://youtu.be/${v.youtubeId}` : '');
-  const parse = (s: string) => {
-    const m = s.trim().match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([A-Za-z0-9_-]{11})/) ?? s.trim().match(/^([A-Za-z0-9_-]{11})$/);
-    return m ? m[1] : '';
-  };
-  const id = parse(link);
-  return (
-    <form className="ad-form wide" onSubmit={(e) => { e.preventDefault(); onSave({ ...v, youtubeId: id }); }}>
-      <h2>Vidéo de soutenance</h2>
-      <p className="ad-p">Collez le lien YouTube (vidéo « non répertoriée »). Elle n’est chargée sur la page publique qu’au clic.</p>
-      <div className="ad-field"><label htmlFor="yt" className="mono">LIEN YOUTUBE</label>
-        <input id="yt" type="text" inputMode="url" value={link} onChange={(e) => setLink(e.target.value)} placeholder="https://youtu.be/…" />
-        <p className="mono ad-hint">{link && !id ? 'Lien non reconnu' : id ? `Identifiant : ${id}` : 'Vide = « VIDÉO À AJOUTER »'}</p>
-      </div>
-      <div className="ad-field"><label htmlFor="vt" className="mono">TITRE</label><input id="vt" value={v.title} maxLength={160} onChange={(e) => setV({ ...v, title: e.target.value })} /></div>
-      <div className="ad-field"><label htmlFor="vc" className="mono">LÉGENDE</label><textarea id="vc" rows={3} value={v.caption} maxLength={300} onChange={(e) => setV({ ...v, caption: e.target.value })} /></div>
-      <div className="ad-actions"><button type="submit" className="mono ad-primary" disabled={Boolean(link) && !id}>Enregistrer</button></div>
-    </form>
-  );
-}
 
 function MessagesView({ messages, onDelete }: { messages: Message[] | null; onDelete: (id: string) => void }) {
   if (!messages) return <p className="mono">Chargement…</p>;
