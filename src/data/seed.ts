@@ -28,7 +28,7 @@ const rawSeed: z.input<typeof contentSchema> = {
       ],
       featured: true,
       built: [
-        { layer: 'mobile', detail: 'Application Flutter' },
+        { layer: 'mobile', detail: 'Application Flutter (Android, mises à jour par APK)' },
         { layer: 'api', detail: 'API AdonisJS' },
         { layer: 'db', detail: 'Base de données MySQL' },
         { layer: 'interface', detail: 'Panneau d’administration web séparé' },
@@ -67,7 +67,7 @@ const rawSeed: z.input<typeof contentSchema> = {
       badge: 'CONCOURS · RÉSULTATS LE 27/11',
       category: 'autre',
       description:
-        'Tableau de bord interactif réalisé en équipe pour le Data Challenge du Togo AI Lab : quelles populations sont les plus éloignées d’un centre de santé, et où agir en priorité ? 396 cantons analysés, avec des données issues à 100 % de opendata.gouv.tg et geodata.gouv.tg.',
+        'Tableau de bord interactif réalisé en équipe pour le Data Challenge du Togo AI Lab : quelles populations sont les plus éloignées d’un centre de santé, et où agir en priorité ? 396 cantons analysés, avec des données issues à 100 % de opendata.gouv.tg et geodata.gouv.tg. Mon rôle : choisir les données à utiliser, repérer les jeux de données exploitables et les modéliser sur carte.',
       problem: '1 026 437 habitants, soit 12,7 % de la population, vivent à plus de 5 km à vol d’oiseau d’une USP, d’un CMS ou d’un hôpital.',
       solution:
         'Une carte des priorités par canton et par préfecture, un simulateur d’implantation de 1 à 50 nouveaux centres (10 centres bien placés font passer 128 436 habitants sous les 5 km) et une liste de centres de santé à équiper en solaire en priorité.',
@@ -82,9 +82,8 @@ const rawSeed: z.input<typeof contentSchema> = {
       ],
       featured: false,
       built: [
-        { layer: 'db', detail: 'Collecte et nettoyage des données ouvertes (API opendata et geodata)' },
-        { layer: 'api', detail: 'Analyse : distances, indice de priorité, typologie des cantons' },
-        { layer: 'interface', detail: 'Tableau de bord Plotly Dash : cartes, filtres, export CSV' },
+        { layer: 'db', detail: 'Choix des données et inventaire des jeux exploitables (opendata.gouv.tg, geodata.gouv.tg)' },
+        { layer: 'interface', detail: 'Modélisation des données sur carte : régions, préfectures, cantons, centres de santé' },
         { layer: 'deploy', detail: 'Déploiement Vercel' },
       ],
       status: 'Tableau de bord en ligne · résultats du concours le 27 novembre 2026',
@@ -120,7 +119,7 @@ const rawSeed: z.input<typeof contentSchema> = {
         'Site vitrine d’import de véhicules Asie → Lomé : catalogue, prix « tout compris » (véhicule, transport, dédouanement) affichés dans la devise choisie (FCFA, EUR, USD, NGN, GHS), thème clair/sombre.',
       problem: '',
       solution: '',
-      stack: 'Netlify · Responsive · SEO',
+      stack: 'HTML · CSS · JavaScript · Netlify',
       url: 'https://demo-gadvision.netlify.app/',
       cta: 'Voir la démo ↗',
       image: 'asset:gamedi',
@@ -165,7 +164,7 @@ const rawSeed: z.input<typeof contentSchema> = {
     {
       id: 'licence',
       year: '2023 – 2026',
-      title: 'Licence en Génie Logiciel',
+      title: 'Licence Professionnelle en Génie Logiciel',
       school: 'IPNET Institute of Technology, Lomé',
       detail: 'Soutenue le 21 novembre 2026',
       current: false,
@@ -237,8 +236,7 @@ const rawSeed: z.input<typeof contentSchema> = {
     },
   ],
   diplomas: [
-    { id: 'licence', title: 'Licence en Génie Logiciel — IPNET', status: 'Soutenue le 21 nov. 2026 · diplôme À AJOUTER', file: '', link: '' },
-    { id: 'certificats', title: 'Certificats Stanford, Cisco, Fortinet, Great Learning', status: '7 certificats', file: '', link: '#certifications' },
+    { id: 'licence', title: 'Licence Professionnelle en Génie Logiciel — IPNET', status: 'Soutenue le 21 nov. 2026 · diplôme À AJOUTER', file: '', link: '' },
   ],
   video: {
     youtubeId: '',

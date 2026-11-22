@@ -14,6 +14,7 @@ export const identity = {
   phone: '+22897848880',
   phoneDisplay: '+228 97 84 88 80',
   github: 'https://github.com/kokoudev',
+  linkedin: 'https://www.linkedin.com/in/ariel-soedje-884158298/',
   school: 'IPNET Institute of Technology',
   skills: ['Développement web', 'Développement mobile', ...skillNames, 'Cybersécurité', 'Algorithmique'],
 };
@@ -65,7 +66,7 @@ export function buildJsonLd(site: URL, portraitUrl: string, content?: Content) {
       telephone: identity.phone,
       address: { '@type': 'PostalAddress', addressLocality: identity.city, addressCountry: identity.countryCode },
       nationality: { '@type': 'Country', name: identity.country },
-      sameAs: [identity.github],
+      sameAs: [identity.github, identity.linkedin],
       knowsAbout: identity.skills,
       alumniOf: { '@type': 'CollegeOrUniversity', name: identity.school, address: { '@type': 'PostalAddress', addressLocality: 'Lomé', addressCountry: 'TG' } },
       ...(content
@@ -102,11 +103,12 @@ export function buildJsonLd(site: URL, portraitUrl: string, content?: Content) {
 }
 
 export const faq: [string, string][] = [
-  ['Qui est kokoudev ?', `kokoudev est le pseudonyme de ${identity.name}, ${identity.jobTitle.toLowerCase()} basé à Lomé (Togo), qui a soutenu sa Licence en Génie Logiciel à IPNET (2023 – 2026) le 21 novembre 2026.`],
+  ['Qui est kokoudev ?', `kokoudev est le pseudonyme de ${identity.name}, ${identity.jobTitle.toLowerCase()} basé à Lomé (Togo), qui a soutenu sa Licence Professionnelle en Génie Logiciel à IPNET (2023 – 2026) le 21 novembre 2026.`],
   ['Sur quoi travaille kokoudev ?', 'Des sites et des applications web et mobiles : VISION, un antivol connecté pour motos et son projet de fin d’études (application Flutter, API AdonisJS, base MySQL et panneau d’administration ; boîtier ESP32 en prototypage), Givvly (plateforme de dons), un tableau de bord sur l’accès aux soins au Togo réalisé en équipe pour le Data Challenge du Togo AI Lab, AlgoVisualizer, une application Symfony de gestion des soutenances et le site vitrine d’un client (GAMÉDI).'],
   ['Quelles technologies utilise-t-il ?', 'Interface : HTML/CSS, JavaScript, React et Plotly Dash. Backend : AdonisJS, Python et PHP/Symfony. Données : MySQL, pandas et GeoPandas. Mobile : Flutter. Déploiement : Git, Netlify, Vercel et Railway. Il a aussi une base en cybersécurité (Cisco, Fortinet) et en algorithmique (Stanford).'],
-  ['Comment contacter kokoudev ?', `Par email à ${identity.email}, par téléphone au ${identity.phoneDisplay}, ou via GitHub (github.com/kokoudev).`],
-  ['Est-il disponible ?', 'Oui : pour un emploi, un stage ou une mission, à Lomé ou à distance (fuseau GMT+0).'],
+  ['Comment contacter kokoudev ?', `Par email à ${identity.email}, par téléphone au ${identity.phoneDisplay}, ou via LinkedIn et GitHub (github.com/kokoudev).`],
+  ['Est-il disponible ?', 'Oui, immédiatement : pour un emploi, un stage ou une mission, à Lomé ou à distance (fuseau GMT+0).'],
+  ['Quelles langues parle-t-il ?', 'Français (courant), éwé (langue maternelle) et anglais (compréhension).'],
 ];
 
 export function faqJsonLd() {

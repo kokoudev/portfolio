@@ -6,7 +6,7 @@ import type { Content, Project } from './schema';
  * enregistré AVANT un changement, sans écraser ce que le propriétaire a modifié depuis l'admin :
  * un champ n'est remplacé que s'il contient encore l'ancienne valeur d'origine.
  */
-export const MIGRATION_IDS = ['preuves-2026-11', 'fortinet-lien-2026-11', 'fortinet-retour-2026-11', 'soutenance-2026-11', 'data-challenge-liens-2026-11', 'sans-video-2026-11', 'coherence-2026-11'] as const;
+export const MIGRATION_IDS = ['preuves-2026-11', 'fortinet-lien-2026-11', 'fortinet-retour-2026-11', 'soutenance-2026-11', 'data-challenge-liens-2026-11', 'sans-video-2026-11', 'coherence-2026-11', 'reponses-2026-11'] as const;
 
 /** Anciennes valeurs d'origine (avant la migration « preuves-2026-11 »). */
 const OLD: Record<string, Partial<Record<keyof Project, string>>> = {
@@ -144,6 +144,33 @@ function coherence(c: Content): Content {
   };
 }
 
+/** Réponses du propriétaire (22/11/2026) : Licence Professionnelle, rôle dans le Data Challenge, Android, GAMÉDI, ligne « certificats » retirée des diplômes. */
+const OLD_TDC_DESC = 'Tableau de bord interactif réalisé en équipe pour le Data Challenge du Togo AI Lab : quelles populations sont les plus éloignées d’un centre de santé, et où agir en priorité ? 396 cantons analysés, avec des données issues à 100 % de opendata.gouv.tg et geodata.gouv.tg.';
+function reponses(c: Content, seed: Content): Content {
+  const fresh = new Map(seed.projects.map((p) => [p.id, p]));
+  const projects = c.projects.map((p) => {
+    if (p.id === 'togo-soins') {
+      const t = fresh.get('togo-soins');
+      if (!t) return p;
+      return {
+        ...p,
+        description: p.description === OLD_TDC_DESC ? t.description : p.description,
+        built: p.built.some((b) => b.detail === 'Tableau de bord Plotly Dash : cartes, filtres, export CSV') ? t.built : p.built,
+      };
+    }
+    if (p.id === 'vision') {
+      return { ...p, built: p.built.map((b) => (b.layer === 'mobile' && b.detail === 'Application Flutter' ? { ...b, detail: 'Application Flutter (Android, mises à jour par APK)' } : b)) };
+    }
+    if (p.id === 'gamedi' && p.stack === 'Netlify · Responsive · SEO') return { ...p, stack: 'HTML · CSS · JavaScript · Netlify' };
+    return p;
+  });
+  const formations = c.formations.map((f) => (f.id === 'licence' && f.title === 'Licence en Génie Logiciel' ? { ...f, title: 'Licence Professionnelle en Génie Logiciel' } : f));
+  const diplomas = c.diplomas
+    .filter((d) => !(d.id === 'certificats' && d.link === '#certifications'))
+    .map((d) => (d.id === 'licence' && d.title === 'Licence en Génie Logiciel — IPNET' ? { ...d, title: 'Licence Professionnelle en Génie Logiciel — IPNET' } : d));
+  return { ...c, projects, formations, diplomas };
+}
+
 const STEPS: Record<(typeof MIGRATION_IDS)[number], (c: Content, seed: Content) => Content> = {
   'preuves-2026-11': preuves,
   'fortinet-lien-2026-11': fortinetLien,
@@ -152,6 +179,7 @@ const STEPS: Record<(typeof MIGRATION_IDS)[number], (c: Content, seed: Content) 
   'data-challenge-liens-2026-11': dataChallengeLiens,
   'sans-video-2026-11': sansVideo,
   'coherence-2026-11': coherence,
+  'reponses-2026-11': reponses,
 };
 
 /** Applique les migrations manquantes (idempotent). */
