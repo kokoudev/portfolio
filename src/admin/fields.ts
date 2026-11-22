@@ -35,6 +35,7 @@ export const fields: Record<CollectionName, Field[]> = {
     { name: 'status', label: 'Statut actuel (étude de cas)', type: 'text' },
     { name: 'url', label: 'Lien (https://…)', type: 'url' },
     { name: 'cta', label: 'Texte du lien', type: 'text' },
+    { name: 'repoUrl', label: 'Code source (lien GitHub, facultatif)', type: 'url', hint: 'Affiché en plus du lien principal : « Voir le code ».' },
     { name: 'image', label: 'Capture', type: 'file', accept: IMG, hint: 'Vérifiez qu’aucun numéro de téléphone n’apparaît sur la capture.' },
     { name: 'imageAlt', label: 'Description de la capture (accessibilité)', type: 'text' },
     { name: 'gallery', label: 'Autres captures d’écran', type: 'gallery', accept: IMG, hint: 'Vérifiez qu’aucun numéro de téléphone n’apparaît sur les captures.' },

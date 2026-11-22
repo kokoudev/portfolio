@@ -83,7 +83,8 @@ export function buildJsonLd(site: URL, portraitUrl: string, content?: Content) {
   ];
   if (content) {
     for (const p of content.projects) {
-      const repo = p.url.startsWith('https://github.com/');
+      const repoUrl = p.repoUrl || (p.url.startsWith('https://github.com/') ? p.url : '');
+      const repo = repoUrl !== '';
       graph.push({
         '@type': repo ? 'SoftwareSourceCode' : p.category === 'client' ? 'WebSite' : 'CreativeWork',
         '@id': `${base}/#projet-${p.id}`,
@@ -93,7 +94,7 @@ export function buildJsonLd(site: URL, portraitUrl: string, content?: Content) {
         isPartOf: { '@id': `${base}/#profile` },
         keywords: p.stack,
         url: p.url.startsWith('https://') ? p.url : `${base}/#projet-${p.id}`,
-        ...(repo ? { codeRepository: p.url } : {}),
+        ...(repo ? { codeRepository: repoUrl } : {}),
       });
     }
   }

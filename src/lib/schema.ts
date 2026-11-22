@@ -61,6 +61,7 @@ export const projectSchema = z.object({
   stack: text(200),
   url: safeUrl,
   cta: text(60),
+  repoUrl: safeUrl.default(''),
   image: imageRef,
   imageAlt: text(200),
   gallery: z.array(galleryItem).max(12).default([]),

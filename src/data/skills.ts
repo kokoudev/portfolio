@@ -46,6 +46,7 @@ export const skillLayers: SkillLayer[] = [
       { name: 'Git', proofs: [], note: 'tous les dépôts' },
       { name: 'Railway', proofs: ['algovisualizer'] },
       { name: 'Netlify', proofs: ['gamedi'] },
+      { name: 'Vercel', proofs: ['togo-soins'] },
     ],
     extra: { label: 'github.com/kokoudev ↗', href: 'https://github.com/kokoudev' },
   },

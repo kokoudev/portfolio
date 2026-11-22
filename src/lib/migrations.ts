@@ -6,7 +6,7 @@ import type { Content, Project } from './schema';
  * enregistré AVANT un changement, sans écraser ce que le propriétaire a modifié depuis l'admin :
  * un champ n'est remplacé que s'il contient encore l'ancienne valeur d'origine.
  */
-export const MIGRATION_IDS = ['preuves-2026-11', 'fortinet-lien-2026-11', 'fortinet-retour-2026-11', 'soutenance-2026-11'] as const;
+export const MIGRATION_IDS = ['preuves-2026-11', 'fortinet-lien-2026-11', 'fortinet-retour-2026-11', 'soutenance-2026-11', 'data-challenge-liens-2026-11'] as const;
 
 /** Anciennes valeurs d'origine (avant la migration « preuves-2026-11 »). */
 const OLD: Record<string, Partial<Record<keyof Project, string>>> = {
@@ -102,11 +102,30 @@ function soutenance(c: Content, seed: Content): Content {
   return { ...c, projects, formations, diplomas, video };
 }
 
+/** Tableau de bord du Data Challenge en ligne : lien du site, dépôt GitHub, statut et couche déploiement. */
+function dataChallengeLiens(c: Content): Content {
+  return {
+    ...c,
+    projects: c.projects.map((p) =>
+      p.id !== 'togo-soins'
+        ? p
+        : {
+            ...p,
+            url: p.url || 'https://acces-aux-soins-togo.vercel.app/',
+            repoUrl: p.repoUrl || 'https://github.com/kokoudev/acces-aux-soins-togo',
+            status: p.status === 'Tableau de bord en cours de déploiement · résultats du concours le 27 novembre 2026' ? 'Tableau de bord en ligne · résultats du concours le 27 novembre 2026' : p.status,
+            built: p.built.map((b) => (b.layer === 'deploy' && b.planned && b.detail === 'Mise en ligne du tableau de bord' ? { layer: 'deploy' as const, detail: 'Déploiement Vercel', planned: false } : b)),
+          },
+    ),
+  };
+}
+
 const STEPS: Record<(typeof MIGRATION_IDS)[number], (c: Content, seed: Content) => Content> = {
   'preuves-2026-11': preuves,
   'fortinet-lien-2026-11': fortinetLien,
   'fortinet-retour-2026-11': fortinetRetour,
   'soutenance-2026-11': soutenance,
+  'data-challenge-liens-2026-11': dataChallengeLiens,
 };
 
 /** Applique les migrations manquantes (idempotent). */

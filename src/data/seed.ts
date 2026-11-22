@@ -72,8 +72,9 @@ const rawSeed: z.input<typeof contentSchema> = {
       solution:
         'Une carte des priorités par canton et par préfecture, un simulateur d’implantation de 1 à 50 nouveaux centres (10 centres bien placés font passer 128 436 habitants sous les 5 km) et une liste de centres de santé à équiper en solaire en priorité.',
       stack: 'Python · pandas · GeoPandas · Plotly Dash',
-      url: '',
+      url: 'https://acces-aux-soins-togo.vercel.app/',
       cta: 'Voir le tableau de bord ↗',
+      repoUrl: 'https://github.com/kokoudev/acces-aux-soins-togo',
       image: 'asset:togo-soins-carte',
       imageAlt: 'Carte de l’indice de priorité d’accès aux soins par canton, avec le classement des cantons les plus prioritaires',
       gallery: [
@@ -84,9 +85,9 @@ const rawSeed: z.input<typeof contentSchema> = {
         { layer: 'db', detail: 'Collecte et nettoyage des données ouvertes (API opendata et geodata)' },
         { layer: 'api', detail: 'Analyse : distances, indice de priorité, typologie des cantons' },
         { layer: 'interface', detail: 'Tableau de bord Plotly Dash : cartes, filtres, export CSV' },
-        { layer: 'deploy', detail: 'Mise en ligne du tableau de bord', planned: true },
+        { layer: 'deploy', detail: 'Déploiement Vercel' },
       ],
-      status: 'Tableau de bord en cours de déploiement · résultats du concours le 27 novembre 2026',
+      status: 'Tableau de bord en ligne · résultats du concours le 27 novembre 2026',
     },
     {
       id: 'algovisualizer',
